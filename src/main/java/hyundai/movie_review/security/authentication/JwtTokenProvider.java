@@ -6,8 +6,10 @@ import io.jsonwebtoken.InvalidClaimException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import java.util.Date;
 import java.util.Map;
 import javax.crypto.SecretKey;
@@ -76,9 +78,11 @@ public class JwtTokenProvider {
             throw new CustomJwtException("[ERROR] Expired Jwt Token"); // 만료된 JWT가 전달된 경우
         } catch (InvalidClaimException invalidClaimException) {
             throw new CustomJwtException("[ERROR] Invalid Jwt Token"); // JWT의 클레임이 유효하지 않은 경우
-        } catch (JwtException jwtException) {
-            throw new CustomJwtException("[ERROR] JWT Error"); // 기타 JWT 관련 오류 발생 시
-        } catch (Exception e) {
+        } catch (SignatureException signatureException) {
+            throw new CustomJwtException("[ERROR] JWT Signiture Error"); // 기타 JWT 관련 오류 발생 시
+        } catch (UnsupportedJwtException e) {
+            throw new CustomJwtException("[ERROR] Unsupported Jwt Token");// 그 외의 예외 발생 시
+        }   catch (Exception e) {
             throw new CustomJwtException("[ERROR] Internal Error");// 그 외의 예외 발생 시
         }
 

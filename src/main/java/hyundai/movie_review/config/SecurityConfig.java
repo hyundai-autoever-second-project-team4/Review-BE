@@ -1,6 +1,8 @@
 package hyundai.movie_review.config;
 
 import hyundai.movie_review.security.authentication.CustomUserDetailService;
+import hyundai.movie_review.security.authentication.JwtAuthenticationFilter;
+import hyundai.movie_review.security.authentication.JwtTokenProvider;
 import hyundai.movie_review.security.handler.CustomAuthenticationSuccessHandler;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -25,6 +28,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailService userDetailService;
     private final CustomAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -79,6 +83,10 @@ public class SecurityConfig {
                 oauth.userInfoEndpoint(c -> c.userService(userDetailService))
                         .successHandler(authenticationSuccessHandler)
         );
+
+        // 모든 요청에 대한 jwt 검증 필터 구현
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
