@@ -25,3 +25,17 @@
 </tbody>
 </table>
 
+
+## 사용자 인증/인가 flow
+```mermaid
+flowchart TD
+    A[요청 시작] --> B[Authorization 헤더에서 JWT 토큰 추출]
+    B --> C{JWT 토큰이 있는가?}
+    C -- 예 --> D{JWT 토큰이 유효한가?}
+    C -- 아니오 --> G[인증 실패 - 요청 거부]
+    D -- 예 --> E[Username 추출 후 UserDetails 로드]
+    D -- 아니오 --> G[인증 실패 - 요청 거부]
+    E --> F[SecurityContext에 Authentication 설정]
+    F --> H[요청 처리]
+    G --> H[요청 처리]
+```
