@@ -49,22 +49,25 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String accessToken = jwtTokenProvider.generateAccessToken(claims);
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
-        // 4. JWT 토큰을 쿠키에 저장
-        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setHttpOnly(false);
-        accessTokenCookie.setSecure(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(10 * 60); // 10분 = 600초
+        // accessToken 쿠키 설정
+        String accessTokenCookie = String.format(
+                "accessToken=%s; Domain=theaterup.site; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=%d",
+                accessToken,
+                60 * 60 * 24 // 1일
+        );
+        response.addHeader("Set-Cookie", accessTokenCookie);
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60);
+// refreshToken 쿠키 설정
+        String refreshTokenCookie = String.format(
+                "refreshToken=%s; Domain=theaterup.site; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=%d",
+                refreshToken,
+                7 * 24 * 60 * 60 // 7일
+        );
+        response.addHeader("Set-Cookie", refreshTokenCookie);
 
-        // 5. 응답에 쿠키 추가
-        response.addCookie(accessTokenCookie);
-        response.addCookie(refreshTokenCookie);
+//        // 5. 응답에 쿠키 추가
+//        response.addCookie(accessTokenCookie);
+//        response.addCookie(refreshTokenCookie);
 
         response.sendRedirect(redirectUrl);
     }
