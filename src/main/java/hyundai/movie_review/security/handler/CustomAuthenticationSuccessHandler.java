@@ -49,25 +49,29 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String accessToken = jwtTokenProvider.generateAccessToken(claims);
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
-        // accessToken 쿠키 설정
+        // 현재 서버가 localhost인지 확인하여 개발 환경인지 판단
+        String domain = request.getServerName().contains("localhost") ? "localhost" : "theaterup.site";
+        boolean isSecure = !domain.equals("localhost"); // 배포 환경에서는 true, 로컬 테스트에서는 false
+
+        // AccessToken 쿠키 설정
         String accessTokenCookie = String.format(
-                "accessToken=%s; Domain=theaterup.site; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=%d",
+                "accessToken=%s; Domain=%s; Path=/; HttpOnly; %s; Max-Age=%d",
                 accessToken,
-                60 * 60 * 24 // 1일
+                domain,
+                isSecure ? "Secure; SameSite=None" : "", // 배포 환경에서만 보안 속성 추가
+                60 * 60 * 24
         );
         response.addHeader("Set-Cookie", accessTokenCookie);
 
-// refreshToken 쿠키 설정
+        // RefreshToken 쿠키 설정
         String refreshTokenCookie = String.format(
-                "refreshToken=%s; Domain=theaterup.site; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=%d",
+                "refreshToken=%s; Domain=%s; Path=/; HttpOnly; %s; Max-Age=%d",
                 refreshToken,
-                7 * 24 * 60 * 60 // 7일
+                domain,
+                isSecure ? "Secure; SameSite=None" : "",
+                7 * 24 * 60 * 60
         );
         response.addHeader("Set-Cookie", refreshTokenCookie);
-
-//        // 5. 응답에 쿠키 추가
-//        response.addCookie(accessTokenCookie);
-//        response.addCookie(refreshTokenCookie);
 
         response.sendRedirect(redirectUrl);
     }
