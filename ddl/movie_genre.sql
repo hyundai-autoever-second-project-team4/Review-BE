@@ -1,0 +1,6 @@
+CREATE TABLE MOVIE_GENRE
+(
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    movie_id INT NOT NULL,
+    genre_id INT NOT NULL
+);

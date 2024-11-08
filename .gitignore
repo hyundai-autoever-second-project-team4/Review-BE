@@ -38,3 +38,6 @@ out/
 
 ### application.yaml ###
 application.yaml
+
+### query DSL generated ###
+generated
