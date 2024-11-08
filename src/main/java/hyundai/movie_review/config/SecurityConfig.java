@@ -28,7 +28,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailService userDetailService;
     private final CustomAuthenticationSuccessHandler authenticationSuccessHandler;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -88,7 +88,7 @@ public class SecurityConfig {
         );
 
         // 모든 요청에 대한 jwt 검증 필터 구현
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+        http.addFilterBefore(jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

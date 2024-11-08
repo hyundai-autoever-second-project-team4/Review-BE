@@ -47,7 +47,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         );
 
         String accessToken = jwtTokenProvider.generateAccessToken(claims);
-        String refreshToken = jwtTokenProvider.createRefreshToken();
+        String refreshToken = jwtTokenProvider.createRefreshToken(userInfo.email());
 
         // 현재 서버가 localhost인지 확인하여 개발 환경인지 판단
         String domain = request.getServerName().contains("localhost") ? "localhost" : "theaterup.site";
