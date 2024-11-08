@@ -2,8 +2,11 @@ package hyundai.movie_review.comment.service;
 
 import hyundai.movie_review.comment.dto.CommentCreateRequest;
 import hyundai.movie_review.comment.entity.Comment;
+import hyundai.movie_review.comment.exception.CommentIdNotFoundException;
+import hyundai.movie_review.comment.exception.CommentMemberIdValidationException;
 import hyundai.movie_review.comment.repository.CommentRepository;
 import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.member.exception.MemberEmailNotFoundException;
 import hyundai.movie_review.security.MemberResolver;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -39,5 +42,23 @@ public class CommentService {
         // 추가) comment entity -> dto로 변환하는 작업
 
         return savedComment;
+    }
+
+    public void deleteComment(Long commentId) {
+        // 1) 현재 멤버 정보가 있는 지 확인
+        Member member = memberResolver.getCurrentMember();
+
+        // 2) comment db에서 해당 commentId가 있는 지 검증
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(CommentIdNotFoundException::new);
+
+        // 3) comment의 작성자가 현재 접속한 멤버와 같은 지
+        if (member.getId() != comment.getMemberId()) {
+            throw new CommentMemberIdValidationException();
+        }
+
+        commentRepository.delete(comment);
+
+        log.info("코멘트 삭제 완료!");
     }
 }
