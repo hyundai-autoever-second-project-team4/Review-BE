@@ -28,16 +28,21 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "badge_id")
+    private Long badgeId;
+    @Column(name = "tier_id")
+    private Long tierId;
     private String email;
     private String name;
     @Column(name = "profile_image")
     private String profileImage;
-    private String nickname;
     private String social;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @Column(name = "total_score")
+    private Long totalScore;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Builder.Default
