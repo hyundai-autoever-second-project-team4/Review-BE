@@ -1,14 +1,17 @@
 package hyundai.movie_review.comment.service;
 
-import hyundai.movie_review.comment.dto.CommentCreateRequest;
+import hyundai.movie_review.comment.dto.*;
 import hyundai.movie_review.comment.entity.Comment;
 import hyundai.movie_review.comment.exception.CommentIdNotFoundException;
 import hyundai.movie_review.comment.exception.CommentMemberIdValidationException;
+import hyundai.movie_review.comment.exception.ReviewIdNotFoundException;
 import hyundai.movie_review.comment.repository.CommentRepository;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.exception.MemberEmailNotFoundException;
 import hyundai.movie_review.security.MemberResolver;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,9 +22,10 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+//    private final ReviewRepository reviewRepository;
     private final MemberResolver memberResolver;
 
-    public Comment createComment(CommentCreateRequest request) {
+    public CommentCreateResponse createComment(CommentCreateRequest request) {
         // 1) 현재 api를 사용하는 멤버 정보를 가져온다.
         Member member = memberResolver.getCurrentMember();
 
@@ -41,7 +45,35 @@ public class CommentService {
 
         // 추가) comment entity -> dto로 변환하는 작업
 
-        return savedComment;
+        return new CommentCreateResponse(
+                savedComment.getMemberId(),
+                savedComment.getReviewId(),
+                savedComment.getContent(),
+                savedComment.getCreatedAt()
+        );
+    }
+
+    public CommentUpdateResponse updateComment(CommentUpdateRequest request){
+        Member member = memberResolver.getCurrentMember();
+
+        Comment comment = commentRepository.findById(request.reviewId())
+                .orElseThrow(CommentIdNotFoundException::new);
+
+        if(member.getId() != comment.getReviewId()){
+            throw new CommentMemberIdValidationException();
+        }
+
+        comment.changeContent(request.content());
+        Comment savedComment = commentRepository.save(comment);
+
+        log.info("comment 수정 완료 , 멤버 이름 : {}, 코멘트 넘버 {}, 수정된 코멘트 {}"
+                , member.getName(), savedComment.getId(), savedComment.getContent());
+
+        return new CommentUpdateResponse(
+                savedComment.getReviewId(),
+                savedComment.getContent(),
+                savedComment.getUpdatedAt()
+        );
     }
 
     public void deleteComment(Long commentId) {
@@ -60,5 +92,29 @@ public class CommentService {
         commentRepository.delete(comment);
 
         log.info("코멘트 삭제 완료!");
+    }
+
+    // review 와 연관
+//    public List<Comment> getAllComments(Long reviewId){
+//        Review review = reviewRepository.findById(reviewId)
+//                .orElseThrow(ReviewIdNotFoundException::new);
+//
+//        List<Comment> commentList= commentRepository.findByReviewId(reviewId);
+//
+//        return commentList;
+//    }
+
+    public CommentGetResponse getComment(Long commentId){
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(CommentIdNotFoundException::new);
+
+        return new CommentGetResponse(
+                comment.getId(),
+                comment.getMemberId(),
+                comment.getReviewId(),
+                comment.getContent(),
+                comment.getCreatedAt(),
+                comment.getUpdatedAt()
+        );
     }
 }

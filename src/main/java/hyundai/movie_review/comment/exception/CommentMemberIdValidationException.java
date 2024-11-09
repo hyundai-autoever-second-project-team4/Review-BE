@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class CommentMemberIdValidationException extends BusinessException {
 
     public CommentMemberIdValidationException() {
-        super("[ERROR] 자신이 작성한 댓글만 삭제할 수 있습니다.");
+        super("[ERROR] 사용자가 작성한 댓글이 아닙니다.");
     }
 }
