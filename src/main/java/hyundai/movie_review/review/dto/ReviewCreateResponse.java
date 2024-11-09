@@ -6,10 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "리뷰 생성 응답 데이터")
 public record ReviewCreateResponse(
 
-        @Schema(description = "리뷰 ID", example = "1")
+        @Schema(description = "생성된 리뷰의 ID", example = "1")
         Long reviewId,
 
-        @Schema(description = "응답 메시지", example = "리뷰가 성공적으로 생성되었습니다.")
+        @Schema(description = "생성 완료 메시지", example = "리뷰가 성공적으로 생성되었습니다.")
         String message
 
 ) {

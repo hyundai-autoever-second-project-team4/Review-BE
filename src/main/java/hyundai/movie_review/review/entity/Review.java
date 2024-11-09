@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -40,5 +41,12 @@ public class Review {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    
+
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
+
+    public void delete() {
+        this.deleted = true;
+    }
+
 }
