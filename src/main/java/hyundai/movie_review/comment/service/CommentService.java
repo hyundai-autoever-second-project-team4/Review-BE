@@ -29,6 +29,10 @@ public class CommentService {
         // 1) 현재 api를 사용하는 멤버 정보를 가져온다.
         Member member = memberResolver.getCurrentMember();
 
+        // 리뷰 id가 존재하지 않는 경우 exception 발생
+//        Review review = reviewRepository.findById(reviewId)
+//                .orElseThrow(ReviewIdNotFoundException::new);
+
         // 2) request + 현재 요청한 멤버 = comment
         Comment comment = Comment.builder()
                 .memberId(member.getId())
@@ -56,10 +60,10 @@ public class CommentService {
     public CommentUpdateResponse updateComment(CommentUpdateRequest request){
         Member member = memberResolver.getCurrentMember();
 
-        Comment comment = commentRepository.findById(request.reviewId())
+        Comment comment = commentRepository.findById(request.commentId())
                 .orElseThrow(CommentIdNotFoundException::new);
 
-        if(member.getId() != comment.getReviewId()){
+        if(member.getId() != comment.getMemberId()){
             throw new CommentMemberIdValidationException();
         }
 
@@ -70,7 +74,7 @@ public class CommentService {
                 , member.getName(), savedComment.getId(), savedComment.getContent());
 
         return new CommentUpdateResponse(
-                savedComment.getReviewId(),
+                savedComment.getId(),
                 savedComment.getContent(),
                 savedComment.getUpdatedAt()
         );
@@ -94,7 +98,7 @@ public class CommentService {
         log.info("코멘트 삭제 완료!");
     }
 
-    // review 와 연관
+    // 한 리뷰의 전체 댓글 get -> review 와 연관
 //    public List<Comment> getAllComments(Long reviewId){
 //        Review review = reviewRepository.findById(reviewId)
 //                .orElseThrow(ReviewIdNotFoundException::new);
@@ -104,6 +108,8 @@ public class CommentService {
 //        return commentList;
 //    }
 
+
+    // 특정 댓글 get
     public CommentGetResponse getComment(Long commentId){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(CommentIdNotFoundException::new);
