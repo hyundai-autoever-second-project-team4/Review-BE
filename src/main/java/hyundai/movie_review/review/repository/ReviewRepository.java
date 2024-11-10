@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Optional<Review> findByIdAndDeletedFalse(Long reviewId);
+
+    boolean existsByMemberIdAndMovieId(Long memberId, Long movieId);
 }
