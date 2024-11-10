@@ -1,4 +1,4 @@
-CREATE TABLE MOVIE
+CREATE TABLE movie
 (
     id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
     movie_id           BIGINT,

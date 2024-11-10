@@ -1,4 +1,4 @@
-CREATE TABLE REVIEW (
+CREATE TABLE review (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         movie_id BIGINT,
                         member_id BIGINT,
