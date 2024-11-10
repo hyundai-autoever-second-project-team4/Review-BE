@@ -18,13 +18,5 @@ public record DirectorInfoDto(
         String profilePath
 ) {
 
-    public static DirectorInfoDto of(Director director) {
-        return new DirectorInfoDto(
-                director.getId(),
-                director.getMovieId(),
-                director.getName(),
-                director.getProfilePath()
-        );
-    }
 }
 

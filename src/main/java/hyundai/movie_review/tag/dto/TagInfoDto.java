@@ -12,10 +12,4 @@ public record TagInfoDto(
         String img
 ) {
 
-    public static TagInfoDto of(Tag tag) {
-        return new TagInfoDto(
-                tag.getContent(),
-                tag.getImg()
-        );
-    }
 }

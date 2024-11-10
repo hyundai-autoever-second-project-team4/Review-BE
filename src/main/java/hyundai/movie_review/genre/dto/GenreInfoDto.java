@@ -11,11 +11,4 @@ public record GenreInfoDto(
         String name
 ) {
 
-    public static GenreInfoDto of(Genre genre) {
-        return new GenreInfoDto(
-                genre.getId(),
-                genre.getName()
-        );
-    }
-
 }

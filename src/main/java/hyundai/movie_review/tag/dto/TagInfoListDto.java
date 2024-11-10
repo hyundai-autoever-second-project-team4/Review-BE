@@ -8,5 +8,5 @@ public record TagInfoListDto(
         @Schema(description = "영화에 해당하는 태그 전체 리스트")
         List<TagInfoDto> tags
 ) {
-
+        
 }
