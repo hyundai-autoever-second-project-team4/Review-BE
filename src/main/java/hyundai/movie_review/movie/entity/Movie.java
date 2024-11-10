@@ -54,5 +54,16 @@ public class Movie {
     @Column(name = "total_star_rate")
     private Double totalStarRate;
 
+    // 리뷰가 생성될 때, 영화에 대한 totalReviewCount, totalStarRate 값을 증가시키는 메소드
+    public void increaseTotalValues(Double starRateAmount) {
+        this.totalReviewCount += 1L;
+        this.totalStarRate += starRateAmount;
+    }
 
+    // 리뷰가 삭제될 때, 영화에 대한 totalReviewCount, totalStarRate 값을 감소시키는 메소드
+    public void decreaseTotalValues(Double starRateAmount) {
+        // 리뷰 개수나 별점이 0 이하로 내려가지 않도록 조건 추가
+        this.totalReviewCount = Math.max(0, this.totalReviewCount - 1L);
+        this.totalStarRate = Math.max(0.0, this.totalStarRate - starRateAmount);
+    }
 }

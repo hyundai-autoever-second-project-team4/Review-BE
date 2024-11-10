@@ -50,12 +50,16 @@ public class ReviewService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
+        // 5) 리뷰를 db에 저장
         Review savedReview = reviewRepository.save(review);
 
-        /* TODO
-         *   영화 리뷰 정보를 영화 db에 반영하기
-         *       1) 영화 db의 total Review count 증가
+        /* 6) 영화 리뷰 정보를 영화 db에 반영
+         *       1) 영화 db의 total Review count를 1만큼 증가
          *       2)  영화 db의 누적 review star rate 증가 */
+        movie.increaseTotalValues(savedReview.getStarRate());
+
+        // 7) 변경된 영화 정보를 db에 반영
+        movieRepository.save(movie);
 
         log.info("Review 생성 성공 : {}", savedReview.getId());
 
