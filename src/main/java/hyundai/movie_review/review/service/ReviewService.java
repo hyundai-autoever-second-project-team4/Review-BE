@@ -75,20 +75,26 @@ public class ReviewService {
         Review review = reviewRepository.findByIdAndDeletedFalse(reviewId)
                 .orElseThrow(ReviewIdNotFoundException::new);
 
-        // 3) 해당 멤버가 리뷰 작성자인지 확인
+        // 3) review의 movie id가 db에 존재하는 지 확인 및 조회
+        Movie movie = movieRepository.findByMovieId(review.getMovieId())
+                .orElseThrow(MovieIdNotFoundException::new);
+
+        // 4) 해당 멤버가 리뷰 작성자인지 확인
         validateReviewAuthor(currentMember.getId(), review.getMemberId());
 
-        // 4) 리뷰 상태를 삭제 상태로 변경
+        // 5) 리뷰 상태를 삭제 상태로 변경
         review.delete();
 
-        /* TODO
-         *   해당 review의 movieId에 해당하는 movie의 정보 변경하기
+        /* 6)
+         *   해당 review의 movieId에 해당하는 movie의 정보 변경
          *       movie의 total review count를 하나 제거
          *       movie의 total star rate를 review의 star rate 만큼 뺴기
          * */
+        movie.decreaseTotalValues(review.getStarRate());
 
-        // 5) 삭제 사항 반영
+        // 6) 삭제 사항 반영
         reviewRepository.save(review);
+        movieRepository.save(movie);
 
         return ReviewDeleteResponse.of(review);
     }
