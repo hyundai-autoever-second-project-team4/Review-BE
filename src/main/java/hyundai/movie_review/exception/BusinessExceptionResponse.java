@@ -1,12 +1,22 @@
 package hyundai.movie_review.exception;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
 
+@Schema(description = "비즈니스 예외 응답 모델")
 public record BusinessExceptionResponse(
-        int status,       // HTTP 상태 코드
-        String error,     // 에러 타입 (예: "Bad Request")
-        String message,   // 에러 메시지 (예: "[ERROR] 해당 member Email은 존재하지 않습니다.")
-        String exception  // 예외 클래스명
+
+        @Schema(description = "HTTP 상태 코드")
+        int status,
+
+        @Schema(description = "에러 타입", example = "Bad Request, Unauthorized, ...")
+        String error,
+
+        @Schema(description = "예외에 대한 상세 메시지", example = "[ERROR] 에러 메세지 ...")
+        String message,
+
+        @Schema(description = "예외 클래스명", example = "BusinessException")
+        String exception
 ) {
 
     public BusinessExceptionResponse(HttpStatus httpStatus, String message, String exception) {
