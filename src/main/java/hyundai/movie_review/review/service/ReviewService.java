@@ -1,10 +1,14 @@
 package hyundai.movie_review.review.service;
 
 import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.movie.entity.Movie;
+import hyundai.movie_review.movie.exception.MovieIdNotFoundException;
+import hyundai.movie_review.movie.repository.MovieRepository;
 import hyundai.movie_review.review.dto.ReviewCreateRequest;
 import hyundai.movie_review.review.dto.ReviewCreateResponse;
 import hyundai.movie_review.review.dto.ReviewDeleteResponse;
 import hyundai.movie_review.review.entity.Review;
+import hyundai.movie_review.review.exception.ReviewAlreadyExistsException;
 import hyundai.movie_review.review.exception.ReviewAuthorMismatchException;
 import hyundai.movie_review.review.exception.ReviewIdNotFoundException;
 import hyundai.movie_review.review.repository.ReviewRepository;
@@ -21,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final MovieRepository movieRepository;
     private final MemberResolver memberResolver;
 
     @Transactional
@@ -28,13 +33,17 @@ public class ReviewService {
         // 1) 현재 로그인 한 멤버를 가져온다.
         Member currentMember = memberResolver.getCurrentMember();
 
-        /* TODO
-         *   request.movieId가 db에 존재하는 지 검증하기 */
+        // 2) request의 movie id가 db에 존재하는 지 확인
+        Movie movie = movieRepository.findByMovieId(request.movieId())
+                .orElseThrow(MovieIdNotFoundException::new);
 
-        // 2) 멤버 정보를 이용하여 Review Entity 생성
+        // 3) 작성된 리뷰가 있는 지 확인. 리뷰는 영화당 1개만 작성 가능
+        validateReviewExists(currentMember.getId(), movie.getMovieId());
+
+        // 4) 멤버 정보를 이용하여 Review Entity 생성
         Review review = Review.builder()
-                .movieId(request.movieId())
-                .memberId(currentMember.getId())
+                .movieId(movie.getMovieId())    // movie entity 값 사용
+                .memberId(currentMember.getId()) // member entity 값 사용
                 .starRate(request.starRate())
                 .content(request.content())
                 .spoiler(request.spoiler())
@@ -80,6 +89,14 @@ public class ReviewService {
         return ReviewDeleteResponse.of(review);
     }
 
+    /* 영화 id에 해당하는 리뷰가 존재하는 지 검증 */
+    private void validateReviewExists(Long memberId, Long movieId) {
+        if (reviewRepository.existsByMemberIdAndMovieId(memberId, movieId)) {
+            throw new ReviewAlreadyExistsException();
+        }
+    }
+
+    /* 리뷰 id에 해당하는 작성자가 일치하는 지 검증 */
     private void validateReviewAuthor(Long memberId, Long reviewerId) {
         if (!memberId.equals(reviewerId)) {
             throw new ReviewAuthorMismatchException();
