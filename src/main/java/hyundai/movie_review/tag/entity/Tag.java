@@ -25,6 +25,4 @@ public class Tag {
     private String content;
 
     private String img;
-
-    private String description;
 }
