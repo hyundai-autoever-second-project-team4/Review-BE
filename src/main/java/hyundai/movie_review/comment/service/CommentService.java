@@ -4,16 +4,24 @@ import hyundai.movie_review.comment.dto.*;
 import hyundai.movie_review.comment.entity.Comment;
 import hyundai.movie_review.comment.exception.CommentIdNotFoundException;
 import hyundai.movie_review.comment.exception.CommentMemberIdValidationException;
+import hyundai.movie_review.comment.exception.MemberIdNotFoundException;
 import hyundai.movie_review.comment.exception.ReviewIdNotFoundException;
 import hyundai.movie_review.comment.repository.CommentRepository;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.exception.MemberEmailNotFoundException;
+import hyundai.movie_review.member.repository.MemberRepository;
+import hyundai.movie_review.review.entity.Review;
+import hyundai.movie_review.review.repository.ReviewRepository;
 import hyundai.movie_review.security.MemberResolver;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +30,8 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-//    private final ReviewRepository reviewRepository;
+    private final ReviewRepository reviewRepository;
+    private final MemberRepository memberRepository;
     private final MemberResolver memberResolver;
 
     public CommentCreateResponse createComment(CommentCreateRequest request) {
@@ -30,8 +39,8 @@ public class CommentService {
         Member member = memberResolver.getCurrentMember();
 
         // 리뷰 id가 존재하지 않는 경우 exception 발생
-//        Review review = reviewRepository.findById(reviewId)
-//                .orElseThrow(ReviewIdNotFoundException::new);
+        Review review = reviewRepository.findById(request.reviewId())
+                .orElseThrow(ReviewIdNotFoundException::new);
 
         // 2) request + 현재 요청한 멤버 = comment
         Comment comment = Comment.builder()
@@ -98,29 +107,56 @@ public class CommentService {
         log.info("코멘트 삭제 완료!");
     }
 
-    // 한 리뷰의 전체 댓글 get -> review 와 연관
-//    public List<Comment> getAllComments(Long reviewId){
-//        Review review = reviewRepository.findById(reviewId)
-//                .orElseThrow(ReviewIdNotFoundException::new);
-//
-//        List<Comment> commentList= commentRepository.findByReviewId(reviewId);
-//
-//        return commentList;
-//    }
+    // 한 리뷰의 전체 댓글
+    public CommentGetAllResponse getAllComments(Long reviewId, Integer page){
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(ReviewIdNotFoundException::new);
 
+        PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC, "createdAt"));
+        Page<Comment> commentList= commentRepository.findByReviewId(reviewId, pageRequest);
+
+        List<CommentGetAllResponse.CommentDto> comments = commentList.getContent().stream()
+                .map(
+                        comment -> {
+                            Member member = memberRepository.findById(comment.getMemberId())
+                                    .orElseThrow(MemberIdNotFoundException::new);
+                            return new CommentGetAllResponse.CommentDto(
+                                    comment.getId(),
+                                    comment.getReviewId(),
+                                    member.getName(),
+                                    member.getProfileImage(),
+                                    member.getTierId(),
+                                    member.getBadgeId(),
+                                    comment.getContent(),
+                                    comment.getCreatedAt()
+                            );
+                        }
+                ).toList();
+
+        return new CommentGetAllResponse(
+                commentList.getTotalElements(),
+                comments
+        );
+
+    }
 
     // 특정 댓글 get
     public CommentGetResponse getComment(Long commentId){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(CommentIdNotFoundException::new);
 
+        Member member = memberRepository.findById(comment.getMemberId())
+                .orElseThrow();
+
         return new CommentGetResponse(
                 comment.getId(),
-                comment.getMemberId(),
                 comment.getReviewId(),
+                member.getName(),
+                member.getProfileImage(),
+                member.getTierId(),
+                member.getBadgeId(),
                 comment.getContent(),
-                comment.getCreatedAt(),
-                comment.getUpdatedAt()
+                comment.getCreatedAt()
         );
     }
 }
