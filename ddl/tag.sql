@@ -1,0 +1,7 @@
+CREATE TABLE tag
+(
+    id      INT AUTO_INCREMENT PRIMARY KEY,
+
+    content VARCHAR(255) NOT NULL,
+    img VARCHAR(255) NOT NULL
+);

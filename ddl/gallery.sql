@@ -1,6 +1,6 @@
-CREATE TABLE GALLERY
+CREATE TABLE gallery
 (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
     movie_id  BIGINT,
-    file_path VARCHAR(255)
+    gallery_path VARCHAR(255)
 );
