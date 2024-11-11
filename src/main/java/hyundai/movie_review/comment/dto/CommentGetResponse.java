@@ -18,11 +18,11 @@ public record CommentGetResponse (
         @Schema(description = "멤버 프로필 사진", example = "http://k.kakaocdn.net/...")
         String profileImage,
 
-        @Schema(description = "티어 ID", example = "1")
-        Long tierImage,
+        @Schema(description = "티어 이미지 경로", example = "1")
+        String tierImage,
 
-        @Schema(description = "대표뱃지 ID", example = "1")
-        Long badgeImage,
+        @Schema(description = "대표뱃지 이미지 경로", example = "1")
+        String badgeImage,
 
         @Schema(description = "댓글 내용", example = "완전 공감해요!!")
         String content,

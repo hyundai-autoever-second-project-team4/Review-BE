@@ -7,6 +7,7 @@ import hyundai.movie_review.comment.exception.CommentMemberIdValidationException
 import hyundai.movie_review.comment.exception.MemberIdNotFoundException;
 import hyundai.movie_review.comment.exception.ReviewIdNotFoundException;
 import hyundai.movie_review.comment.repository.CommentRepository;
+import hyundai.movie_review.member.dto.MemberBadgeAndTierDto;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.exception.MemberEmailNotFoundException;
 import hyundai.movie_review.member.repository.MemberRepository;
@@ -120,13 +121,16 @@ public class CommentService {
                         comment -> {
                             Member member = memberRepository.findById(comment.getMemberId())
                                     .orElseThrow(MemberIdNotFoundException::new);
+
+                            MemberBadgeAndTierDto dto = memberRepository.getTierAndBadgeImgByMemberId(member.getId());
+                            log.info("{}", memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
                             return new CommentGetResponse(
                                     comment.getId(),
                                     comment.getReviewId(),
                                     member.getName(),
                                     member.getProfileImage(),
-                                    member.getTierId(),
-                                    member.getBadgeId(),
+                                    dto.tierImage(),
+                                    dto.badgeImage(),
                                     comment.getContent(),
                                     comment.getCreatedAt()
                             );
@@ -147,14 +151,16 @@ public class CommentService {
 
         Member member = memberRepository.findById(comment.getMemberId())
                 .orElseThrow();
+        log.info("{}", memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
+        MemberBadgeAndTierDto dto = memberRepository.getTierAndBadgeImgByMemberId(member.getId());
 
         return new CommentGetResponse(
                 comment.getId(),
                 comment.getReviewId(),
                 member.getName(),
                 member.getProfileImage(),
-                member.getTierId(),
-                member.getBadgeId(),
+                dto.tierImage(),
+                dto.badgeImage(),
                 comment.getContent(),
                 comment.getCreatedAt()
         );
