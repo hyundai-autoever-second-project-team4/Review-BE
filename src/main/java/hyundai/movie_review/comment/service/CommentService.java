@@ -115,12 +115,12 @@ public class CommentService {
         PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC, "createdAt"));
         Page<Comment> commentList= commentRepository.findByReviewId(reviewId, pageRequest);
 
-        List<CommentGetAllResponse.CommentDto> comments = commentList.getContent().stream()
+        List<CommentGetResponse> comments = commentList.getContent().stream()
                 .map(
                         comment -> {
                             Member member = memberRepository.findById(comment.getMemberId())
                                     .orElseThrow(MemberIdNotFoundException::new);
-                            return new CommentGetAllResponse.CommentDto(
+                            return new CommentGetResponse(
                                     comment.getId(),
                                     comment.getReviewId(),
                                     member.getName(),
