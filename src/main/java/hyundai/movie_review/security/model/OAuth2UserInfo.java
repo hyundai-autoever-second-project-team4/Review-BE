@@ -3,7 +3,12 @@ package hyundai.movie_review.security.model;
 import hyundai.movie_review.member.entity.Member;
 import java.time.LocalDateTime;
 import java.util.Map;
+
+import hyundai.movie_review.tier.entity.Tier;
+import hyundai.movie_review.tier.exception.TierIdNotFound;
+import hyundai.movie_review.tier.repository.TierRepository;
 import lombok.Builder;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Builder
 public record OAuth2UserInfo(
@@ -54,10 +59,16 @@ public record OAuth2UserInfo(
                 .build();
     }
 
+    @Autowired
+    private static TierRepository tierRepository;
     public Member toEntity() {
+        //처음 가입시 티어 1
+        Tier tier = tierRepository.findById(1L)
+                .orElseThrow(TierIdNotFound::new);
+
         Member member = Member.builder()
                 .badgeId(1L)
-                .tierId(1L)
+                .tierId(tier)
                 .email(email)
                 .name(name)
                 .profileImage(profileImage)

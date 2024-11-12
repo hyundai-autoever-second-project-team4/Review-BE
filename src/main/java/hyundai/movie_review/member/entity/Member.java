@@ -1,16 +1,13 @@
 package hyundai.movie_review.member.entity;
 
+import hyundai.movie_review.member_badge.entity.MemberBadge;
 import hyundai.movie_review.security.model.MemberRole;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import hyundai.movie_review.tier.entity.Tier;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,8 +27,11 @@ public class Member {
     private Long id;
     @Column(name = "badge_id")
     private Long badgeId;
-    @Column(name = "tier_id")
-    private Long tierId;
+
+    @ManyToOne
+    @JoinColumn(name = "tier_id")
+    private Tier tierId;
+
     private String email;
     private String name;
     @Column(name = "profile_image")
@@ -53,4 +53,7 @@ public class Member {
     }
 
 
+    // MemberBadge entity와 연결
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    private List<MemberBadge> memberBadges;
 }
