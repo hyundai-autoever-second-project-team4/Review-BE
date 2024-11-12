@@ -52,7 +52,7 @@ class ReviewServiceTest {
 
         // 영화 id를 912649 (베놈)으로 mocking
         Movie movie = Movie.builder()
-                .movieId(movieId)
+                .id(movieId)
                 .totalReviewCount(0L)
                 .totalStarRate(0.0)
                 .build();
@@ -62,7 +62,7 @@ class ReviewServiceTest {
 
         // Review 엔티티 생성
         Review review = Review.builder()
-                .movieId(movie.getMovieId())
+                .movieId(movie.getId())
                 .memberId(member.getId())
                 .starRate(request.starRate())
                 .content(request.content())
@@ -74,11 +74,11 @@ class ReviewServiceTest {
         when(memberResolver.getCurrentMember()).thenReturn(member);
 
         // request의 movieId를 통해 '베놈' 영화를 가져오도록 mocking
-        when(movieRepository.findByMovieId(request.movieId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(request.movieId())).thenReturn(Optional.of(movie));
 
         // 멤버 ID와 영화 ID를 통해 중복 리뷰 여부 확인
         when(reviewRepository.existsByMemberIdAndMovieId(member.getId(),
-                movie.getMovieId())).thenReturn(false);
+                movie.getId())).thenReturn(false);
 
         // 리뷰 저장 시 mock이 생성한 review를 반환하도록 설정
         when(reviewRepository.save(any(Review.class))).thenReturn(review);
@@ -98,12 +98,12 @@ class ReviewServiceTest {
         Long movieId = 912649L;
 
         Member member = Member.builder().id(memberId).build();
-        Movie movie = Movie.builder().movieId(movieId).build();
+        Movie movie = Movie.builder().id(movieId).build();
 
         ReviewCreateRequest request = new ReviewCreateRequest(movieId, 4.5, "굿입니다.", false);
 
         when(memberResolver.getCurrentMember()).thenReturn(member);
-        when(movieRepository.findByMovieId(request.movieId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(request.movieId())).thenReturn(Optional.of(movie));
         when(reviewRepository.existsByMemberIdAndMovieId(memberId, movieId)).thenReturn(true);
 
         assertThrows(ReviewAlreadyExistsException.class, () -> reviewService.createReview(request));
@@ -119,7 +119,7 @@ class ReviewServiceTest {
         ReviewCreateRequest request = new ReviewCreateRequest(movieId, 4.5, "굿입니다.", false);
 
         when(memberResolver.getCurrentMember()).thenReturn(member);
-        when(movieRepository.findByMovieId(request.movieId())).thenReturn(Optional.empty());
+        when(movieRepository.findById(request.movieId())).thenReturn(Optional.empty());
 
         assertThrows(MovieIdNotFoundException.class, () -> reviewService.createReview(request));
     }
@@ -135,14 +135,14 @@ class ReviewServiceTest {
         Review review = Review.builder().id(reviewId).memberId(2L).movieId(912649L)
                 .build(); // 다른 사용자 ID와 영화 ID 설정
         Movie movie = Movie.builder()
-                .movieId(movieId)
+                .id(movieId)
                 .totalReviewCount(1L)
                 .totalStarRate(4.5)
                 .build();
 
         when(memberResolver.getCurrentMember()).thenReturn(member);
         when(reviewRepository.findByIdAndDeletedFalse(reviewId)).thenReturn(Optional.of(review));
-        when(movieRepository.findByMovieId(movieId)).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
 
         assertThrows(ReviewAuthorMismatchException.class,
                 () -> reviewService.deleteReview(reviewId));
@@ -157,7 +157,7 @@ class ReviewServiceTest {
 
         Member member = Member.builder().id(memberId).build();
         Movie movie = Movie.builder()
-                .movieId(movieId)
+                .id(movieId)
                 .totalReviewCount(1L)
                 .totalStarRate(4.5)
                 .build();
@@ -173,7 +173,7 @@ class ReviewServiceTest {
         // Mock 설정
         when(memberResolver.getCurrentMember()).thenReturn(member);
         when(reviewRepository.findByIdAndDeletedFalse(reviewId)).thenReturn(Optional.of(review));
-        when(movieRepository.findByMovieId(movieId)).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
 
         // Act
         ReviewDeleteResponse response = reviewService.deleteReview(reviewId);
@@ -205,7 +205,7 @@ class ReviewServiceTest {
 
         Member member = Member.builder().id(memberId).build();
         Movie movie = Movie.builder()
-                .movieId(movieId)
+                .id(movieId)
                 .totalReviewCount(0L)
                 .totalStarRate(0.0)
                 .build();
@@ -221,7 +221,7 @@ class ReviewServiceTest {
                 .build();
 
         when(memberResolver.getCurrentMember()).thenReturn(member);
-        when(movieRepository.findByMovieId(movieId)).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
         when(reviewRepository.existsByMemberIdAndMovieId(memberId, movieId)).thenReturn(false);
         when(reviewRepository.save(any(Review.class))).thenReturn(review);
 
@@ -241,7 +241,7 @@ class ReviewServiceTest {
         // 멤버 및 영화 초기화
         Member member = Member.builder().id(memberId).build();
         Movie movie = Movie.builder()
-                .movieId(movieId)
+                .id(movieId)
                 .totalReviewCount(2L)   // 초기 리뷰 수 2로 설정
                 .totalStarRate(9.0)     // 초기 별점 9.0로 설정
                 .build();
@@ -260,7 +260,7 @@ class ReviewServiceTest {
         // Mock 설정
         when(memberResolver.getCurrentMember()).thenReturn(member);
         when(reviewRepository.findByIdAndDeletedFalse(reviewId)).thenReturn(Optional.of(review));
-        when(movieRepository.findByMovieId(movieId)).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
 
         // Act
         reviewService.deleteReview(reviewId);

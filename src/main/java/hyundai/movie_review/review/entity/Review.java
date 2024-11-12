@@ -43,7 +43,7 @@ public class Review {
     private LocalDateTime createdAt;
 
     @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
+    private Boolean deleted;
 
     public void delete() {
         this.deleted = true;

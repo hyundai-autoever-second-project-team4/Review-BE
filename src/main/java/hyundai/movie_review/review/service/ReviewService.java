@@ -48,6 +48,7 @@ public class ReviewService {
                 .content(request.content())
                 .spoiler(request.spoiler())
                 .createdAt(LocalDateTime.now())
+                .deleted(false)
                 .build();
 
         // 5) 리뷰를 db에 저장
