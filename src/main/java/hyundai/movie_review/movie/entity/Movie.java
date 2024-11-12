@@ -2,8 +2,6 @@ package hyundai.movie_review.movie.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -21,11 +19,8 @@ import lombok.NoArgsConstructor;
 public class Movie {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "movie_id")
-    private Long movieId;
+    private Long id;  // autoincrement 없이 수동 설정
 
     private String title;
 
@@ -62,7 +57,6 @@ public class Movie {
 
     // 리뷰가 삭제될 때, 영화에 대한 totalReviewCount, totalStarRate 값을 감소시키는 메소드
     public void decreaseTotalValues(Double starRateAmount) {
-        // 리뷰 개수나 별점이 0 이하로 내려가지 않도록 조건 추가
         this.totalReviewCount = Math.max(0, this.totalReviewCount - 1L);
         this.totalStarRate = Math.max(0.0, this.totalStarRate - starRateAmount);
     }
