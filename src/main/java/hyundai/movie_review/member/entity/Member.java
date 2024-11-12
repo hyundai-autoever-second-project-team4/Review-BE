@@ -1,5 +1,6 @@
 package hyundai.movie_review.member.entity;
 
+import hyundai.movie_review.badge.entity.Badge;
 import hyundai.movie_review.member_badge.entity.MemberBadge;
 import hyundai.movie_review.security.model.MemberRole;
 import hyundai.movie_review.tier.entity.Tier;
@@ -25,12 +26,14 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "badge_id")
-    private Long badgeId;
+
+    @OneToOne
+    @JoinColumn(name = "badge_id")
+    private Badge badge;
 
     @ManyToOne
     @JoinColumn(name = "tier_id")
-    private Tier tierId;
+    private Tier tier;
 
     private String email;
     private String name;
@@ -52,6 +55,12 @@ public class Member {
         this.memberRoles.add(role);
     }
 
+    public void setTier(Tier tier) {
+        this.tier = tier;
+    }
+    public void setBadge(Badge badge) {
+        this.badge = badge;
+    }
 
     // MemberBadge entity와 연결
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)

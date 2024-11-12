@@ -1,8 +1,16 @@
 package hyundai.movie_review.security.authentication;
 
+import hyundai.movie_review.badge.entity.Badge;
+import hyundai.movie_review.badge.exception.BadgeIdNotFoundException;
+import hyundai.movie_review.badge.repository.BadgeRepository;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.repository.MemberRepository;
+import hyundai.movie_review.member_badge.entity.MemberBadge;
+import hyundai.movie_review.member_badge.repository.MemberBadgeRepository;
 import hyundai.movie_review.security.model.OAuth2UserInfo;
+import hyundai.movie_review.tier.entity.Tier;
+import hyundai.movie_review.tier.exception.TierIdNotFound;
+import hyundai.movie_review.tier.repository.TierRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomUserDetailService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
+    private final TierRepository tierRepository;
+    private final BadgeRepository badgeRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
 
     @Transactional
     @Override
@@ -55,6 +66,22 @@ public class CustomUserDetailService extends DefaultOAuth2UserService {
     private Member getOrSave(OAuth2UserInfo oAuth2UserInfo) {
         Member member = memberRepository.findByEmail(oAuth2UserInfo.email())
                 .orElseGet(oAuth2UserInfo::toEntity);
+
+        // 처음 회원가입 일 떄의 로직
+        if (member.getTier() == null || member.getBadge() == null) {
+            Tier initTier = tierRepository.findById(1L)
+                    .orElseThrow(TierIdNotFound::new);
+            Badge initBadge = badgeRepository.findById(1L)
+                    .orElseThrow(BadgeIdNotFoundException::new);
+            MemberBadge memberBadge = MemberBadge.builder()
+                    .memberId(member)
+                    .badgeId(initBadge)
+                    .build();
+            memberBadgeRepository.save(memberBadge);
+
+            member.setBadge(initBadge);
+            member.setTier(initTier);
+        }
 
         return memberRepository.save(member);
     }

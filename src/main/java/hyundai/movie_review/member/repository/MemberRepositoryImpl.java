@@ -23,8 +23,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                 badge.image,
                 tier.image))
                 .from(member)
-                .join(badge).on(member.badgeId.eq(badge.id))
-                .join(member.tierId, tier)
+                .join(badge).on(member.badge.eq(badge))
+                .join(member.tier, tier)
                 .where(member.id.eq(id))
                 .fetchOne();
     }
