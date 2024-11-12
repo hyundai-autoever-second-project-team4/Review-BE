@@ -2,9 +2,13 @@ package hyundai.movie_review.thear_up.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "THEAR_UP")
 public class ThearUp {
     @Id
