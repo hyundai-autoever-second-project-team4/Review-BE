@@ -2,10 +2,11 @@ package hyundai.movie_review.member.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import hyundai.movie_review.badge.entity.QBadge;
 import hyundai.movie_review.member.dto.MemberBadgeAndTierDto;
-import hyundai.movie_review.member.entity.QMember;
-import hyundai.movie_review.tier.entity.QTier;
+import static hyundai.movie_review.badge.entity.QBadge.badge;
+import static hyundai.movie_review.member.entity.QMember.member;
+import static hyundai.movie_review.member_badge.entity.QMemberBadge.memberBadge;
+import static hyundai.movie_review.tier.entity.QTier.tier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,15 +16,16 @@ import org.springframework.stereotype.Repository;
 public class MemberRepositoryImpl implements MemberRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
 
+    // 멤버 티어와 대표 뱃지 이미지 경로 dto
     @Override
     public MemberBadgeAndTierDto getTierAndBadgeImgByMemberId(Long id) {
         return jpaQueryFactory.select(Projections.constructor(MemberBadgeAndTierDto.class,
-                QBadge.badge.image,
-                QTier.tier.image))
-                .from(QMember.member)
-                .join(QBadge.badge).on(QMember.member.badgeId.eq(QBadge.badge.id))
-                .join(QTier.tier).on(QMember.member.tierId.eq(QTier.tier.id))
-                .where(QMember.member.id.eq(id))
+                badge.image,
+                tier.image))
+                .from(member)
+                .join(badge).on(member.badgeId.eq(badge.id))
+                .join(member.tierId, tier)
+                .where(member.id.eq(id))
                 .fetchOne();
     }
 }
