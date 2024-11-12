@@ -1,12 +1,12 @@
-package hyundai.movie_review.thear_up.entity;
+package hyundai.movie_review.thear_down.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "THEAR_UP")
-public class ThearUp {
+@Table(name = "THEAR_DOWN")
+public class ThearDown {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,7 +17,7 @@ public class ThearUp {
     @Column(name = "review_id")
     private Long reviewId;
 
-    public ThearUp(Long memberId, Long reviewId){
+    public ThearDown(Long memberId, Long reviewId) {
         this.memberId = memberId;
         this.reviewId = reviewId;
     }
