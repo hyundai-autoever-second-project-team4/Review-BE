@@ -34,7 +34,7 @@ public record MovieDetailResponse(
         TagInfoListDto tagInfoList,
 
         @Schema(description = "영화에 대한 리뷰 정보 목록")
-        ReviewCountListDto reviewCountList
+        ReviewCountListDto reviewCountInfo
 ) {
 
     public static MovieDetailResponse of(Movie movie, ReviewCountListDto reviewCountListDto) {

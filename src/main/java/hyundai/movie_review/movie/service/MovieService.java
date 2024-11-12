@@ -26,8 +26,8 @@ public class MovieService {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(MovieIdNotFoundException::new);
         // 2) 영화 id에 해당하는 리뷰 조회
-        ReviewCountListDto reviewCountListDto = ReviewCountListDto.of(
-                reviewRepository.getReviewCountsByMovieId(movieId));
+        ReviewCountListDto reviewCountListDto =
+                reviewRepository.getReviewCountsByMovieId(movieId);
 
         return MovieDetailResponse.of(movie, reviewCountListDto);
     }
