@@ -6,7 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
-    Optional<Movie> findByMovieId(Long movieId);
-
-    boolean existsByMovieId(Long movieId);
 }

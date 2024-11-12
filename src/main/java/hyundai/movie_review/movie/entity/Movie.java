@@ -1,12 +1,17 @@
 package hyundai.movie_review.movie.entity;
 
+import hyundai.movie_review.actor.entity.Actor;
+import hyundai.movie_review.director.entity.Director;
+import hyundai.movie_review.gallery.entity.Gallery;
+import hyundai.movie_review.movie_genre.entity.MovieGenre;
+import hyundai.movie_review.movie_tag.entity.MovieTag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,11 +26,8 @@ import lombok.NoArgsConstructor;
 public class Movie {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "movie_id")
-    private Long movieId;
+    private Long id;  // autoincrement 없이 수동 설정
 
     private String title;
 
@@ -54,6 +56,21 @@ public class Movie {
     @Column(name = "total_star_rate")
     private Double totalStarRate;
 
+    @OneToMany(mappedBy = "movie")
+    private List<Actor> actors;
+
+    @OneToMany(mappedBy = "movie")
+    private List<Director> directors;
+
+    @OneToMany(mappedBy = "movie")
+    private List<Gallery> galleries;
+
+    @OneToMany(mappedBy = "movie")
+    private List<MovieGenre> genres;
+
+    @OneToMany(mappedBy = "movie")
+    private List<MovieTag> tags;
+
     // 리뷰가 생성될 때, 영화에 대한 totalReviewCount, totalStarRate 값을 증가시키는 메소드
     public void increaseTotalValues(Double starRateAmount) {
         this.totalReviewCount += 1L;
@@ -62,7 +79,6 @@ public class Movie {
 
     // 리뷰가 삭제될 때, 영화에 대한 totalReviewCount, totalStarRate 값을 감소시키는 메소드
     public void decreaseTotalValues(Double starRateAmount) {
-        // 리뷰 개수나 별점이 0 이하로 내려가지 않도록 조건 추가
         this.totalReviewCount = Math.max(0, this.totalReviewCount - 1L);
         this.totalStarRate = Math.max(0.0, this.totalStarRate - starRateAmount);
     }

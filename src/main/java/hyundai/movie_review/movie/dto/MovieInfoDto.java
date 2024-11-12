@@ -38,4 +38,19 @@ public record MovieInfoDto(
         double totalStarRate
 ) {
 
+    public static MovieInfoDto of(Movie movie) {
+        return new MovieInfoDto(
+                movie.getTitle(),
+                movie.getOverview(),
+                movie.getPosterPath(),
+                movie.getBackdropPath(),
+                movie.getAdult(),
+                movie.getReleaseDate(),
+                movie.getRuntime(),
+                movie.getOriginCountry(),
+                movie.getTotalReviewCount(),
+                movie.getTotalStarRate()
+        );
+    }
+
 }

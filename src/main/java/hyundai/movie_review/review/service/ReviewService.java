@@ -34,15 +34,15 @@ public class ReviewService {
         Member currentMember = memberResolver.getCurrentMember();
 
         // 2) request의 movie id가 db에 존재하는 지 확인
-        Movie movie = movieRepository.findByMovieId(request.movieId())
+        Movie movie = movieRepository.findById(request.movieId())
                 .orElseThrow(MovieIdNotFoundException::new);
 
         // 3) 작성된 리뷰가 있는 지 확인. 리뷰는 영화당 1개만 작성 가능
-        validateReviewExists(currentMember.getId(), movie.getMovieId());
+        validateReviewExists(currentMember.getId(), movie.getId());
 
         // 4) 멤버 정보를 이용하여 Review Entity 생성
         Review review = Review.builder()
-                .movieId(movie.getMovieId())    // movie entity 값 사용
+                .movieId(movie.getId())    // movie entity 값 사용
                 .memberId(currentMember.getId()) // member entity 값 사용
                 .starRate(request.starRate())
                 .content(request.content())
@@ -76,7 +76,7 @@ public class ReviewService {
                 .orElseThrow(ReviewIdNotFoundException::new);
 
         // 3) review의 movie id가 db에 존재하는 지 확인 및 조회
-        Movie movie = movieRepository.findByMovieId(review.getMovieId())
+        Movie movie = movieRepository.findById(review.getMovieId())
                 .orElseThrow(MovieIdNotFoundException::new);
 
         // 4) 해당 멤버가 리뷰 작성자인지 확인
