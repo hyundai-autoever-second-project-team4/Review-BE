@@ -1,5 +1,6 @@
 package hyundai.movie_review.actor.dto;
 
+import hyundai.movie_review.actor.entity.Actor;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "영화 배우 정보 DTO")
@@ -15,5 +16,15 @@ public record ActorInfoDto(
         @Schema(description = "배우의 프로필 이미지", example = "/qJYWq2oZcvHh7lnGskxkrYXCom0.jpg")
         String profilePath
 ) {
+
+    public static ActorInfoDto of(Actor actor) {
+        return new ActorInfoDto(
+                actor.getId(),
+                actor.getMovie().getId(),
+                actor.getName(),
+                actor.getCharacterName(),
+                actor.getProfilePath()
+        );
+    }
 
 }

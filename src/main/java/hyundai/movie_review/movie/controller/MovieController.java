@@ -1,6 +1,7 @@
 package hyundai.movie_review.movie.controller;
 
 import hyundai.movie_review.movie.dto.MovieDetailResponse;
+import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.movie.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public class MovieController {
     private final MovieService movieService;
 
     @GetMapping("/movie/{movieId}")
-    public ResponseEntity<MovieDetailResponse> getMovieDetail(
+    public ResponseEntity<?> getMovieDetail(
             @PathVariable Long movieId
     ) {
         MovieDetailResponse response = movieService.getMovieDetail(movieId);

@@ -1,10 +1,13 @@
 package hyundai.movie_review.actor.entity;
 
+import hyundai.movie_review.movie.entity.Movie;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,11 +26,12 @@ public class Actor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "movie_id")
-    private Long movieId;
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
 
     private String name;
-    
+
     @Column(name = "character_name")
     private String characterName;
 

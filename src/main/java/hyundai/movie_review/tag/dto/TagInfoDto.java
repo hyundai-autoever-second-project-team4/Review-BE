@@ -1,5 +1,6 @@
 package hyundai.movie_review.tag.dto;
 
+import hyundai.movie_review.movie_tag.entity.MovieTag;
 import hyundai.movie_review.tag.entity.Tag;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -11,5 +12,12 @@ public record TagInfoDto(
         @Schema(description = "태그 이미지", example = "./heart.jpg")
         String img
 ) {
+
+    public static TagInfoDto of(MovieTag movieTag) {
+        return new TagInfoDto(
+                movieTag.getTag().getContent(),
+                movieTag.getTag().getImg()
+        );
+    }
 
 }

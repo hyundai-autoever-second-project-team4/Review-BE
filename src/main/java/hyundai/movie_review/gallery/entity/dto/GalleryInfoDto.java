@@ -12,4 +12,11 @@ public record GalleryInfoDto(
 
 ) {
 
+    public static GalleryInfoDto of(Gallery gallery) {
+        return new GalleryInfoDto(
+                gallery.getMovie().getId(),
+                gallery.getGalleryPath()
+        );
+    }
+
 }

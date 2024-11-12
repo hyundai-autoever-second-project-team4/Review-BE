@@ -1,6 +1,7 @@
 package hyundai.movie_review.movie.service;
 
 import hyundai.movie_review.movie.dto.MovieDetailResponse;
+import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.movie.exception.MovieIdNotFoundException;
 import hyundai.movie_review.movie.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,10 @@ public class MovieService {
         // 1) movieId가 db에 존재하는 지 확인
         validateMovieExists(movieId);
 
-        return null;
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(MovieIdNotFoundException::new);
+
+        return MovieDetailResponse.of(movie);
     }
 
     private void validateMovieExists(Long movieId) {
