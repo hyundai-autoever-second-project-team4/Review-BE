@@ -59,16 +59,8 @@ public record OAuth2UserInfo(
                 .build();
     }
 
-    @Autowired
-    private static TierRepository tierRepository;
     public Member toEntity() {
-        //처음 가입시 티어 1
-        Tier tier = tierRepository.findById(1L)
-                .orElseThrow(TierIdNotFound::new);
-
         Member member = Member.builder()
-                .badgeId(1L)
-                .tierId(tier)
                 .email(email)
                 .name(name)
                 .profileImage(profileImage)
