@@ -1,10 +1,16 @@
 package hyundai.movie_review.thear_down.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "THEAR_DOWN")
 public class ThearDown {
     @Id
@@ -16,9 +22,4 @@ public class ThearDown {
 
     @Column(name = "review_id")
     private Long reviewId;
-
-    public ThearDown(Long memberId, Long reviewId) {
-        this.memberId = memberId;
-        this.reviewId = reviewId;
-    }
 }

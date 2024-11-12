@@ -19,9 +19,4 @@ public class ThearUp {
 
     @Column(name = "review_id")
     private Long reviewId;
-
-    public ThearUp(Long memberId, Long reviewId){
-        this.memberId = memberId;
-        this.reviewId = reviewId;
-    }
 }
