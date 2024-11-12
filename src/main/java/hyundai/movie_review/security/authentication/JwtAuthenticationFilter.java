@@ -58,7 +58,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
                 handleRefreshToken(request, response, refreshToken);
-                return;
             } catch (CustomJwtException e) {
                 log.error("JWT 검증 오류: {}", e.getMessage());
                 setErrorResponse(response, HttpStatus.UNAUTHORIZED, e.getMessage(),
