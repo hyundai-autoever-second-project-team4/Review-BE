@@ -1,5 +1,6 @@
 package hyundai.movie_review.thear_up.controller;
 
+import hyundai.movie_review.thear_up.dto.ThearUpResponse;
 import hyundai.movie_review.thear_up.service.ThearUpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,15 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/reviews")
+@RequestMapping("/thearup")
 public class ThearUpController {
     private final ThearUpService thearUpService;
 
-    @PostMapping("/{reviewId}/thearup")
-    public ResponseEntity<?> toggleThearUp(
-            @PathVariable Long reviewId,
-            @AuthenticationPrincipal Long memberId){
-        boolean result = thearUpService.addThearUp(reviewId, memberId);
-        return ResponseEntity.ok(result);
+    @PostMapping("/{reviewId}")
+    public ResponseEntity<ThearUpResponse> toggleThearUp(
+            @PathVariable Long reviewId
+    ){
+        ThearUpResponse response = thearUpService.toggleThearUp(reviewId);
+
+        return ResponseEntity.ok(response);
     }
 }
