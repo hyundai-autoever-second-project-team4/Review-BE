@@ -46,7 +46,7 @@ public class SecurityConfig {
 
                     // 허용할 출처 설정 (모든 출처를 허용하거나 특정 도메인 추가)
                     config.setAllowedOrigins(List.of(
-                            "http://localhost:3000",  // 로컬 개발 환경에서의 요청 허용
+                            "http://localhost:5173",  // 로컬 개발 환경에서의 요청 허용
                             "http://localhost:8080",    // 로컬 개발 환경에서의 요청 허용
                             "https://theaterup.site",     // 프론트엔드 CloudFront 도메인
                             "https://api.theaterup.site"  // 백엔드 EC2 도메인

@@ -50,7 +50,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String refreshToken = jwtTokenProvider.createRefreshToken(userInfo.email());
 
         // 현재 서버가 localhost인지 확인하여 개발 환경인지 판단
-        String domain = request.getServerName().contains("localhost") ? "localhost" : "theaterup.site";
+        String domain = request.getServerName().contains("localhost") ? "localhost" : "http://localhost:5173";
         boolean isSecure = !domain.equals("localhost"); // 배포 환경에서는 true, 로컬 테스트에서는 false
 
         // AccessToken 쿠키 설정

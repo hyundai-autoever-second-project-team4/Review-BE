@@ -2,6 +2,7 @@ package hyundai.movie_review.review.entity;
 
 import hyundai.movie_review.comment.entity.Comment;
 import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.thear_down.entity.ThearDown;
 import hyundai.movie_review.thear_up.entity.ThearUp;
 import jakarta.persistence.*;
@@ -26,11 +27,13 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "movie_id")
-    private Long movieId;
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
 
-    @Column(name = "member_id")
-    private Long memberId;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Column(name = "star_rate")
     private Double starRate;

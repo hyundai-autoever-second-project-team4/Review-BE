@@ -36,7 +36,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
         // 1) 해당 영화의 모든 리뷰를 가져오기
         List<Review> reviews = queryFactory
                 .selectFrom(review)
-                .where(review.movieId.eq(movieId))
+                .where(review.movie.id.eq(movieId))
                 .fetch();
 
         // 2) starRate별로 그룹화하여 카운팅
@@ -83,13 +83,13 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
                         thearUp.count(),
                         thearDown.count(),
                         comment.count()
-                        ))
+                ))
                 .from(review)
-                .leftJoin(member).on(review.memberId.eq(member.id))
+                .leftJoin(member).on(review.member.id.eq(member.id))
                 .leftJoin(comment).on(review.id.eq(comment.reviewId.id))
                 .leftJoin(thearUp).on(review.id.eq(thearUp.reviewId.id))
                 .leftJoin(thearDown).on(review.id.eq(thearDown.reviewId.id))
-                .where(review.movieId.eq(movieId))
+                .where(review.movie.id.eq(movieId))
                 .groupBy(review.id, member.id)
                 .orderBy(thearUp.count().desc())
                 .offset(pageable.getOffset())
@@ -98,7 +98,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
         // 2) 전체 개수 조회
         Long reviewCount = queryFactory.select(review).from(review)
-                .where(review.movieId.eq(movieId))
+                .where(review.movie.id.eq(movieId))
                 .fetchCount();
 
         log.info("실행결과 : {} , reviews : {}", reviews, reviewCount);
