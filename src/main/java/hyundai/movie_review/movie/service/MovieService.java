@@ -7,6 +7,7 @@ import hyundai.movie_review.movie.dto.MovieWithRatingInfoDto;
 import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.movie.exception.MovieIdNotFoundException;
 import hyundai.movie_review.movie.repository.MovieRepository;
+import hyundai.movie_review.movie.vo.MovieGenreCountMap;
 import hyundai.movie_review.review.dto.ReviewCountListDto;
 import hyundai.movie_review.review.dto.*;
 import hyundai.movie_review.review.entity.Review;
@@ -48,11 +49,12 @@ public class MovieService {
         // 4) 로그인한 상태인지 체크 후 thearup, theardown 여부
         boolean isLogin = memberResolver.isAuthenticated();
         List<ReviewInfoListDto> reviewInfos;
-        if(isLogin){
+        if (isLogin) {
             Member member = memberResolver.getCurrentMember();
             reviewInfos = reviews.getContent().stream().map(review -> {
                 boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member, review);
-                boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(member, review);
+                boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(member,
+                        review);
 
                 //로그인 한 경우
                 return ReviewInfoListDto.of(
@@ -71,8 +73,7 @@ public class MovieService {
                         isThearDown
                 );
             }).toList();
-        }
-        else{
+        } else {
             reviewInfos = reviews.getContent().stream().map(review -> {
                 //로그인 안한 경우
                 return ReviewInfoListDto.of(
@@ -94,7 +95,8 @@ public class MovieService {
         }
 
         // 5) Page로 변환
-        Page<ReviewInfoListDto> reviewInfoList = new PageImpl<>(reviewInfos, pageable, reviews.getTotalElements());
+        Page<ReviewInfoListDto> reviewInfoList = new PageImpl<>(reviewInfos, pageable,
+                reviews.getTotalElements());
 
         return MovieDetailResponse.of(movie, reviewCountListDto, reviewInfoList);
     }
@@ -110,6 +112,42 @@ public class MovieService {
         List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findMoviesByMostReviewsThisWeek();
 
         return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
+    }
+
+    public MovieWithRatingListResponse getRecommendedMoviesForMember() {
+        // 1) 현재 로그인 한 멤버 조회
+        Member currentMember = memberResolver.getCurrentMember();
+
+        // 2) 영화 장르를 저장하기 위한 일급 객체 선언
+        MovieGenreCountMap movieGenreCountMap = new MovieGenreCountMap();
+
+        // 3) 멤버가 작성한 리뷰들을 모두 가져와서, 리뷰에 해당하는 영화의 장르 정보를 카운팅
+        currentMember.getReviews()
+                .forEach(review -> {
+                    review.getMovie().getGenres()
+                            .forEach(movieGenre -> {
+                                movieGenreCountMap.addGenreCount(movieGenre.getGenre().getId());
+                            });
+                });
+
+        // 4) 가장 많이 생성된 장르 아이디를 반환
+        long genreId = movieGenreCountMap.getMostCountedGenreId();
+
+        log.info(movieGenreCountMap.toString());
+
+        log.info("가장 선호하는 장르 id : {}", genreId);
+        System.out.println("가장 선호하는 장르");
+
+        // 5) 영화 repository에서 해당 장르에 해당하는 영화를 가져온다.
+        /* 가져올 때의 우선 순위는 다음과 같다.
+         * 1) 별점이 높은 순
+         * 2) 리뷰가 많은 순
+         * */
+        List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findRecommendedMoviesForMemberByGenreId(
+                genreId);
+
+        return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
+
     }
 
 }
