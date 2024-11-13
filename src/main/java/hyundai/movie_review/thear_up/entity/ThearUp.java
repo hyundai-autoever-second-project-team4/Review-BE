@@ -1,5 +1,7 @@
 package hyundai.movie_review.thear_up.entity;
 
+import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,9 +16,11 @@ public class ThearUp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "member_id")
-    private Long memberId;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member memberId;
 
-    @Column(name = "review_id")
-    private Long reviewId;
+    @ManyToOne
+    @JoinColumn(name = "review_id")
+    private Review reviewId;
 }

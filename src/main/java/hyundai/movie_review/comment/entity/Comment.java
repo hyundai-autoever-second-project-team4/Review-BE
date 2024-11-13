@@ -1,10 +1,9 @@
 package hyundai.movie_review.comment.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.review.entity.Review;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,10 +20,17 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "member_id")
-    private Long memberId;
-    @Column(name = "review_id")
-    private Long reviewId;
+
+    // Member와 연결
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member memberId;
+
+    // Review와 연결
+    @ManyToOne
+    @JoinColumn(name = "review_id")
+    private Review reviewId;
+
     private String content;
     @Column(name = "created_at")
     private LocalDateTime createdAt;

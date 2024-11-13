@@ -45,8 +45,8 @@ public class CommentService {
 
         // 2) request + 현재 요청한 멤버 = comment
         Comment comment = Comment.builder()
-                .memberId(member.getId())
-                .reviewId(request.reviewId())
+                .memberId(member)
+                .reviewId(review)
                 .content(request.content())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -60,8 +60,8 @@ public class CommentService {
         // 추가) comment entity -> dto로 변환하는 작업
 
         return new CommentCreateResponse(
-                savedComment.getMemberId(),
-                savedComment.getReviewId(),
+                savedComment.getMemberId().getId(),
+                savedComment.getReviewId().getId(),
                 savedComment.getContent(),
                 savedComment.getCreatedAt()
         );
@@ -73,7 +73,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(request.commentId())
                 .orElseThrow(CommentIdNotFoundException::new);
 
-        if(member.getId() != comment.getMemberId()){
+        if(member.getId() != comment.getMemberId().getId()){
             throw new CommentMemberIdValidationException();
         }
 
@@ -99,7 +99,7 @@ public class CommentService {
                 .orElseThrow(CommentIdNotFoundException::new);
 
         // 3) comment의 작성자가 현재 접속한 멤버와 같은 지
-        if (member.getId() != comment.getMemberId()) {
+        if (member.getId() != comment.getMemberId().getId()) {
             throw new CommentMemberIdValidationException();
         }
 
@@ -114,19 +114,19 @@ public class CommentService {
                 .orElseThrow(ReviewIdNotFoundException::new);
 
         PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC, "createdAt"));
-        Page<Comment> commentList= commentRepository.findByReviewId(reviewId, pageRequest);
+        Page<Comment> commentList= commentRepository.findByReviewId(review, pageRequest);
 
         List<CommentGetResponse> comments = commentList.getContent().stream()
                 .map(
                         comment -> {
-                            Member member = memberRepository.findById(comment.getMemberId())
+                            Member member = memberRepository.findById(comment.getMemberId().getId())
                                     .orElseThrow(MemberIdNotFoundException::new);
 
                             MemberBadgeAndTierDto dto = memberRepository.getTierAndBadgeImgByMemberId(member.getId());
                             log.info("{}", memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
                             return new CommentGetResponse(
                                     comment.getId(),
-                                    comment.getReviewId(),
+                                    comment.getReviewId().getId(),
                                     member.getName(),
                                     member.getProfileImage(),
                                     dto.tierImage(),
@@ -149,14 +149,14 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(CommentIdNotFoundException::new);
 
-        Member member = memberRepository.findById(comment.getMemberId())
+        Member member = memberRepository.findById(comment.getMemberId().getId())
                 .orElseThrow();
         log.info("{}", memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
         MemberBadgeAndTierDto dto = memberRepository.getTierAndBadgeImgByMemberId(member.getId());
 
         return new CommentGetResponse(
                 comment.getId(),
-                comment.getReviewId(),
+                comment.getReviewId().getId(),
                 member.getName(),
                 member.getProfileImage(),
                 dto.tierImage(),

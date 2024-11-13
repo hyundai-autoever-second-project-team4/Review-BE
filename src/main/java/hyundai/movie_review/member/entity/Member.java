@@ -1,8 +1,11 @@
 package hyundai.movie_review.member.entity;
 
 import hyundai.movie_review.badge.entity.Badge;
+import hyundai.movie_review.comment.entity.Comment;
 import hyundai.movie_review.member_badge.entity.MemberBadge;
 import hyundai.movie_review.security.model.MemberRole;
+import hyundai.movie_review.thear_down.entity.ThearDown;
+import hyundai.movie_review.thear_up.entity.ThearUp;
 import hyundai.movie_review.tier.entity.Tier;
 import jakarta.persistence.*;
 
@@ -27,10 +30,12 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // badge와 연결
     @ManyToOne
     @JoinColumn(name = "badge_id")
     private Badge badge;
 
+    // tier와 연결
     @ManyToOne
     @JoinColumn(name = "tier_id")
     private Tier tier;
@@ -64,7 +69,19 @@ public class Member {
         this.badge = badge;
     }
 
-    // MemberBadge entity와 연결
+    // MemberBadge와 연결
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
     private List<MemberBadge> memberBadges;
+
+    // Comment와 연결
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    private List<Comment> comments;
+
+    // ThearUp과 연결
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    private List<ThearUp> thearUps;
+
+    // ThearDown과 연결
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    private  List<ThearDown> thearDowns;
 }

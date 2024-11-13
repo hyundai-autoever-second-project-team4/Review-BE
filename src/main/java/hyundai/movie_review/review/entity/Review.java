@@ -1,13 +1,14 @@
 package hyundai.movie_review.review.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PreRemove;
-import jakarta.persistence.Table;
+import hyundai.movie_review.comment.entity.Comment;
+import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.thear_down.entity.ThearDown;
+import hyundai.movie_review.thear_up.entity.ThearUp;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,5 +49,17 @@ public class Review {
     public void delete() {
         this.deleted = true;
     }
+
+    // Comment와 연결
+    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE)
+    private List<Comment> comments;
+
+    // ThearUp과 연결
+    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE)
+    private List<ThearUp> thearUps;
+
+    // ThearDown과 연결
+    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE)
+    private List<ThearDown> thearDowns;
 
 }
