@@ -2,8 +2,10 @@ package hyundai.movie_review.movie.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import hyundai.movie_review.genre.entity.QGenre;
 import hyundai.movie_review.movie.dto.MovieWithRatingInfoDto;
 import hyundai.movie_review.movie.entity.QMovie;
+import hyundai.movie_review.movie_genre.entity.QMovieGenre;
 import hyundai.movie_review.review.entity.QReview;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -81,4 +83,36 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
                 .limit(10)
                 .fetch();
     }
+
+    @Override
+    public List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long genreId) {
+        QMovie movie = QMovie.movie;
+        QGenre genre = QGenre.genre;
+        QMovieGenre movieGenre = QMovieGenre.movieGenre;
+
+        return queryFactory
+                .select(Projections.constructor(MovieWithRatingInfoDto.class,
+                        movie.id,
+                        movie.title,
+                        movie.overview,
+                        movie.posterPath,
+                        movie.backdropPath,
+                        movie.adult,
+                        movie.releaseDate,
+                        movie.runtime,
+                        movie.originCountry,
+                        movie.totalReviewCount, // totalReviewCount 필드 매핑
+                        movie.totalStarRate     // totalStarRate 필드 매핑
+                ))
+                .from(movie)
+                .join(movieGenre).on(movieGenre.movie.eq(movie))
+                .join(movieGenre.genre, genre)
+                .where(genre.id.eq(genreId))
+                .orderBy(
+                        movie.totalStarRate.desc(),
+                        movie.totalReviewCount.desc()
+                )
+                .fetch();
+    }
+
 }

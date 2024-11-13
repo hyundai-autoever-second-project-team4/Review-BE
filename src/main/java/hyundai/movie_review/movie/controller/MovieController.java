@@ -69,5 +69,21 @@ public class MovieController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "사용자 맞춤 영화 조회", description = "사용자가 작성한 리뷰의 영화 장르 통계를 통해 사용자 맞춤 영화 정보를 리턴합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 맞춤 영화 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MovieWithRatingListResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content())
+    })
+    @GetMapping("/movie/recommend")
+    public ResponseEntity<?> getRecommendedMoviesForMember() {
+        MovieWithRatingListResponse response = movieService.getRecommendedMoviesForMember();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
 
 }

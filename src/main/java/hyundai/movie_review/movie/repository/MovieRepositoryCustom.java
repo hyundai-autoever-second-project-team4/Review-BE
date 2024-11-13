@@ -10,4 +10,6 @@ public interface MovieRepositoryCustom {
 
     List<MovieWithRatingInfoDto> findMoviesByMostReviewsThisWeek();
 
+    List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long genreId);
+
 }
