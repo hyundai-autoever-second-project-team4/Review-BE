@@ -36,8 +36,8 @@ public class MovieController {
     @GetMapping("/movie/{movieId}")
     public ResponseEntity<?> getMovieDetail(
             @Parameter(description = "영화 ID", required = true) @PathVariable Long movieId
-            , @RequestParam("page") Integer page,
-            @RequestParam("size") Integer size
+            , @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         MovieDetailResponse response = movieService.getMovieDetail(movieId, pageable);

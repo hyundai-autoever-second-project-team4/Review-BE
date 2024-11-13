@@ -2,7 +2,7 @@ package hyundai.movie_review.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public record ReviewByMovieIdDto (
+public record ReviewInfoListDto(
     @Schema(description = "멤버 id")
     Long memberId,
 
@@ -34,9 +34,15 @@ public record ReviewByMovieIdDto (
     Long ThearDownCount,
 
     @Schema(description = "리뷰에 대한 댓글 개수")
-    Long commentCount
+    Long commentCount,
+
+    @Schema(description = "내가 리뷰에 띠어럽/좋아요 체크 여부")
+    Boolean isThearUp,
+
+    @Schema(description = "내가 리뷰에 띠어다운/싫어요 체크 여부")
+    Boolean isThearDown
 ){
-    public static ReviewByMovieIdDto of(
+    public static ReviewInfoListDto of(
             Long memberId,
             String memberName,
             String memberProfileImg,
@@ -47,9 +53,11 @@ public record ReviewByMovieIdDto (
             Boolean spoiler,
             Long ThearUpCount,
             Long ThearDownCount,
-            Long commentCount
+            Long commentCount,
+            Boolean isThearUp,
+            Boolean isThearDown
     ){
-        return new ReviewByMovieIdDto(
+        return new ReviewInfoListDto(
                 memberId,
                 memberName,
                 memberProfileImg,
@@ -60,7 +68,9 @@ public record ReviewByMovieIdDto (
                 spoiler,
                 ThearUpCount,
                 ThearDownCount,
-                commentCount
+                commentCount,
+                isThearUp,
+                isThearDown
         );
     }
 }
