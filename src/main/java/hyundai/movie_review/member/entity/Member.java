@@ -27,7 +27,7 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "badge_id")
     private Badge badge;
 
@@ -51,6 +51,7 @@ public class Member {
     @Builder.Default
     private Set<MemberRole> memberRoles = new HashSet<>();
 
+
     public void addRole(MemberRole role) {
         this.memberRoles.add(role);
     }
@@ -58,6 +59,7 @@ public class Member {
     public void setTier(Tier tier) {
         this.tier = tier;
     }
+
     public void setBadge(Badge badge) {
         this.badge = badge;
     }
