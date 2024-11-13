@@ -46,10 +46,10 @@ public class MovieController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이번 주 별점 순 영화 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MovieDetailResponse.class))),
+                            schema = @Schema(implementation = MovieListResponse.class))),
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content())
     })
-    @GetMapping("/movie/star_rate")
+    @GetMapping("/movie/top-rated/weekly")
     public ResponseEntity<?> getHotStarRate() {
         MovieListResponse response = movieService.getMovieStarRate();
 

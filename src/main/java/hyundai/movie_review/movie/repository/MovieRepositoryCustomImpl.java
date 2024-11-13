@@ -2,7 +2,7 @@ package hyundai.movie_review.movie.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import hyundai.movie_review.movie.entity.Movie;
+import hyundai.movie_review.movie.dto.MovieWithRatingInfoDto;
 import hyundai.movie_review.movie.entity.QMovie;
 import hyundai.movie_review.review.entity.QReview;
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Movie> findMoviesByHighestRatingThisWeek() {
+    public List<MovieWithRatingInfoDto> findMoviesByHighestRatingThisWeek() {
         QMovie movie = QMovie.movie;
         QReview review = QReview.review;
 
@@ -27,14 +27,26 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
         LocalDateTime endDate = LocalDateTime.now();
 
         return queryFactory
-                .select(movie)
+                .select(Projections.constructor(MovieWithRatingInfoDto.class,
+                        movie.id,
+                        movie.title,
+                        movie.overview,
+                        movie.posterPath,
+                        movie.backdropPath,
+                        movie.adult,
+                        movie.releaseDate,
+                        movie.runtime,
+                        movie.originCountry,
+                        review.count().as("totalReviewCount"),
+                        review.starRate.avg().as("averageStarRate")
+                ))
                 .from(movie)
                 .join(review).on(review.movieId.eq(movie.id))
                 .where(review.createdAt.between(startDate, endDate)
                         .and(review.deleted.isFalse()))
                 .groupBy(movie.id)
                 .orderBy(review.starRate.avg().desc())
-                .limit(10)  // 상위 10개 영화만 가져오기
+                .limit(10)
                 .fetch();
     }
 }
