@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
 
         String accessToken = extractTokenFromHeaders(request, "Authorization");
-        String refreshToken = extractTokenFromHeaders(request, "Refresh-Token");
+        String refreshToken = extractTokenFromHeaders(request, "RefreshToken");
 
         log.info("accessToken : {}", accessToken);
         log.info("refreshToken : {}", refreshToken);
