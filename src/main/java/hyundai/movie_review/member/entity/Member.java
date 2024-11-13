@@ -3,6 +3,7 @@ package hyundai.movie_review.member.entity;
 import hyundai.movie_review.badge.entity.Badge;
 import hyundai.movie_review.comment.entity.Comment;
 import hyundai.movie_review.member_badge.entity.MemberBadge;
+import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.security.model.MemberRole;
 import hyundai.movie_review.thear_down.entity.ThearDown;
 import hyundai.movie_review.thear_up.entity.ThearUp;
@@ -56,7 +57,6 @@ public class Member {
     @Builder.Default
     private Set<MemberRole> memberRoles = new HashSet<>();
 
-
     public void addRole(MemberRole role) {
         this.memberRoles.add(role);
     }
@@ -83,5 +83,9 @@ public class Member {
 
     // ThearDown과 연결
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
-    private  List<ThearDown> thearDowns;
+    private List<ThearDown> thearDowns;
+
+    // Review와 연결
+    @OneToMany(mappedBy = "member")
+    private List<Review> reviews;
 }
