@@ -12,4 +12,6 @@ public interface MovieRepositoryCustom {
 
     List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long genreId);
 
+    List<MovieWithRatingInfoDto> findHonorBoardMovies();
+
 }

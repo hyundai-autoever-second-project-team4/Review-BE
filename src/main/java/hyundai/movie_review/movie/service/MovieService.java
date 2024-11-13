@@ -148,4 +148,10 @@ public class MovieService {
 
     }
 
+    public MovieWithRatingListResponse getHonorBoardMovies() {
+        List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findHonorBoardMovies();
+
+        return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
+    }
+
 }

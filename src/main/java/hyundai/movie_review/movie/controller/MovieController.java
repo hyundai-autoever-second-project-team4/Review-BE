@@ -83,6 +83,20 @@ public class MovieController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "명예의 전당 영화 조회", description = "전체 영화들 중, 리뷰가 가장 많고 별점이 높은 명예의 전당 영화 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "명예의 전당 영화 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MovieWithRatingListResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content())
+    })
+    @GetMapping("/movie/honor-board")
+    public ResponseEntity<?> getHonorBoardMovies() {
+        MovieWithRatingListResponse response = movieService.getHonorBoardMovies();
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
 
