@@ -46,8 +46,8 @@ public class MovieController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content())
     })
     @GetMapping("/movie/top-rated/weekly")
-    public ResponseEntity<?> getHotStarRate() {
-        MovieWithRatingListResponse response = movieService.getMovieStarRate();
+    public ResponseEntity<?> getMoviesByHighestRatingThisWeek() {
+        MovieWithRatingListResponse response = movieService.getMoviesByHighestRatingThisWeek();
 
         return ResponseEntity.ok(response);
     }
