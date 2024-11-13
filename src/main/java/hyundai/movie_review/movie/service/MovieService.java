@@ -19,8 +19,7 @@ import hyundai.movie_review.thear_down.repository.ThearDownRepository;
 import hyundai.movie_review.thear_up.repository.ThearUpRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +34,7 @@ public class MovieService {
     private final ThearDownRepository thearDownRepository;
     private final MemberResolver memberResolver;
 
-    public MovieDetailResponse getMovieDetail(Long movieId, Pageable pageable) {
+    public MovieDetailResponse getMovieDetail(Long movieId) {
         // 1) 영화 id에 해당하는 영화 정보 조회
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(MovieIdNotFoundException::new);
@@ -44,20 +43,21 @@ public class MovieService {
                 reviewRepository.getReviewCountsByMovieId(movieId);
 
         // 3) 영화 id에 해당하는 리뷰 리스트 조회
-        Page<Review> reviews = reviewRepository.findByMovie(movie, pageable);
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Review> reviews = reviewRepository.findByMovieId(movieId, pageable);
 
         // 4) 로그인한 상태인지 체크 후 thearup, theardown 여부
         boolean isLogin = memberResolver.isAuthenticated();
-        List<ReviewInfoListDto> reviewInfos;
-        if (isLogin) {
+        List<ReviewInfoDto> reviewInfoList;
+        if(isLogin){
             Member member = memberResolver.getCurrentMember();
-            reviewInfos = reviews.getContent().stream().map(review -> {
+            reviewInfoList = reviews.stream().map(review -> {
                 boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member, review);
                 boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(member,
                         review);
 
                 //로그인 한 경우
-                return ReviewInfoListDto.of(
+                return ReviewInfoDto.of(
                         review.getMember().getId(),
                         review.getMember().getName(),
                         review.getMember().getProfileImage(),
@@ -66,17 +66,18 @@ public class MovieService {
                         review.getStarRate(),
                         review.getContent(),
                         review.getSpoiler(),
-                        review.getCommentCounts(),
                         review.getThearUps(),
                         review.getThearDowns(),
+                        review.getCommentCounts(),
                         isThearUp,
                         isThearDown
                 );
             }).toList();
-        } else {
-            reviewInfos = reviews.getContent().stream().map(review -> {
+
+        else{
+            reviewInfoList = reviews.stream().map(review -> {
                 //로그인 안한 경우
-                return ReviewInfoListDto.of(
+                return ReviewInfoDto.of(
                         review.getMember().getId(),
                         review.getMember().getName(),
                         review.getMember().getProfileImage(),
@@ -85,20 +86,19 @@ public class MovieService {
                         review.getStarRate(),
                         review.getContent(),
                         review.getSpoiler(),
-                        review.getCommentCounts(),
                         review.getThearUps(),
                         review.getThearDowns(),
+                        review.getCommentCounts(),
                         false,
                         false
                 );
             }).toList();
         }
 
-        // 5) Page로 변환
-        Page<ReviewInfoListDto> reviewInfoList = new PageImpl<>(reviewInfos, pageable,
-                reviews.getTotalElements());
 
-        return MovieDetailResponse.of(movie, reviewCountListDto, reviewInfoList);
+        ReviewInfoListDto reviewInfoListDto = new ReviewInfoListDto(reviewInfoList);
+
+        return MovieDetailResponse.of(movie, reviewCountListDto, reviewInfoListDto);
     }
 
     public MovieWithRatingListResponse getMoviesByHighestRatingThisWeek() {

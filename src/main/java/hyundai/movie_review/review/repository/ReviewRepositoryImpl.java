@@ -1,10 +1,6 @@
 package hyundai.movie_review.review.repository;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import hyundai.movie_review.comment.entity.QComment;
-import hyundai.movie_review.member.entity.QMember;
-import hyundai.movie_review.review.dto.ReviewInfoListDto;
 import hyundai.movie_review.review.dto.ReviewCountDto;
 import hyundai.movie_review.review.dto.ReviewCountListDto;
 import hyundai.movie_review.review.entity.QReview;
@@ -13,13 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import hyundai.movie_review.thear_down.entity.QThearDown;
-import hyundai.movie_review.thear_up.entity.QThearUp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Slf4j

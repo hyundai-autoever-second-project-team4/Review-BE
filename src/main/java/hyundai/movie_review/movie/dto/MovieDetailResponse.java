@@ -1,16 +1,17 @@
 package hyundai.movie_review.movie.dto;
 
 import hyundai.movie_review.actor.dto.ActorInfoListDto;
-import hyundai.movie_review.director.dto.DirectorInfoDto;
 import hyundai.movie_review.director.dto.DirectorInfoListDto;
 import hyundai.movie_review.gallery.entity.dto.GalleryInfoListDto;
 import hyundai.movie_review.genre.dto.GenreInfoListDto;
 import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.review.dto.ReviewCountListDto;
+import hyundai.movie_review.review.dto.ReviewInfoDto;
 import hyundai.movie_review.review.dto.ReviewInfoListDto;
 import hyundai.movie_review.tag.dto.TagInfoListDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 @Schema(description = "영화 디테일 정보 DTO")
 public record MovieDetailResponse(
@@ -38,10 +39,10 @@ public record MovieDetailResponse(
         @Schema(description = "영화에 대한 리뷰 정보 목록")
         ReviewCountListDto reviewCountInfo,
 
-        Page<ReviewInfoListDto> reviewByMovieIdListDto
+        ReviewInfoListDto reviewInfoList
 ) {
 
-    public static MovieDetailResponse of(Movie movie, ReviewCountListDto reviewCountListDto, Page<ReviewInfoListDto> reviewByMovieIdListDto) {
+    public static MovieDetailResponse of(Movie movie, ReviewCountListDto reviewCountListDto, ReviewInfoListDto reviewByMovieIdListDto) {
         return new MovieDetailResponse(
                 movie.getId(),
                 MovieInfoDto.of(movie),
