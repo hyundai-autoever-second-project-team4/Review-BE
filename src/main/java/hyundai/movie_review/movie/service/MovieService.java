@@ -49,7 +49,7 @@ public class MovieService {
         // 4) 로그인한 상태인지 체크 후 thearup, theardown 여부
         boolean isLogin = memberResolver.isAuthenticated();
         List<ReviewInfoDto> reviewInfoList;
-        if(isLogin){
+        if (isLogin) {
             Member member = memberResolver.getCurrentMember();
             reviewInfoList = reviews.stream().map(review -> {
                 boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member, review);
@@ -73,8 +73,7 @@ public class MovieService {
                         isThearDown
                 );
             }).toList();
-
-        else{
+        } else {
             reviewInfoList = reviews.stream().map(review -> {
                 //로그인 안한 경우
                 return ReviewInfoDto.of(
@@ -94,7 +93,6 @@ public class MovieService {
                 );
             }).toList();
         }
-
 
         ReviewInfoListDto reviewInfoListDto = new ReviewInfoListDto(reviewInfoList);
 
