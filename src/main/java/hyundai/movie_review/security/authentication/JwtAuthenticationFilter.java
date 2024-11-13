@@ -111,7 +111,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void addAccessTokenCookie(HttpServletResponse response, String accessToken,
             HttpServletRequest request) {
         String domain =
-                request.getServerName().contains("localhost") ? "localhost" : "http://localhost:5173/";
+                request.getServerName().contains("localhost") ? "localhost" : "theaterup.site";
         boolean isSecure = !domain.equals("localhost");
 
         String accessTokenCookie = String.format(
