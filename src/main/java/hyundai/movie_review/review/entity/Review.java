@@ -64,5 +64,15 @@ public class Review {
     // ThearDown과 연결
     @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE)
     private List<ThearDown> thearDowns;
-
+    public long getCommentCounts(){ return comments != null ? (long) comments.size() : 0;}
+    public long getThearUps(){
+        if(thearUps != null) return (long) thearUps.size();
+        else return 0L;
+        //return thearUps != null ? (long) thearUps.size() : 0L;
+    }
+    public long getThearDowns(){
+        if(thearDowns != null) return (long) thearDowns.size();
+        else return 0L;
+        //return thearDowns !=  null ? (long) thearDowns.size() : 0L;
+    }
 }

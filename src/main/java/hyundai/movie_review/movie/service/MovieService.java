@@ -10,7 +10,6 @@ import hyundai.movie_review.movie.repository.MovieRepository;
 import hyundai.movie_review.review.dto.ReviewCountListDto;
 import hyundai.movie_review.review.dto.*;
 import hyundai.movie_review.review.entity.Review;
-import hyundai.movie_review.review.exception.ReviewIdNotFoundException;
 import hyundai.movie_review.review.repository.ReviewRepository;
 import java.util.List;
 
@@ -20,6 +19,7 @@ import hyundai.movie_review.thear_up.repository.ThearUpRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -42,44 +42,61 @@ public class MovieService {
         ReviewCountListDto reviewCountListDto =
                 reviewRepository.getReviewCountsByMovieId(movieId);
 
-        // 3) 영화 id에 해당하는 리뷰 내용 조회
-        Page<ReviewByMovieIdDto> reviewInfoDtos = reviewRepository.getReviewInfosByMovieId(movieId, pageable);
+        // 3) 영화 id에 해당하는 리뷰 리스트 조회
+        Page<Review> reviews = reviewRepository.findByMovie(movie, pageable);
 
-        // 4) 로그인한 상태면 thearup, theardown 여부
+        // 4) 로그인한 상태인지 체크 후 thearup, theardown 여부
         boolean isLogin = memberResolver.isAuthenticated();
-        List<ReviewThearUpDownCheckedDto> reviewThearUpDown;
+        List<ReviewInfoListDto> reviewInfos;
         if(isLogin){
             Member member = memberResolver.getCurrentMember();
-            reviewThearUpDown = reviewInfoDtos.getContent()
-                    .stream().map(review -> {
-                        Review r = reviewRepository.findById(review.reviewId())
-                                .orElseThrow(ReviewIdNotFoundException::new);
-                        boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member, r);
-                        boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(member, r);
-                        return ReviewThearUpDownCheckedDto.of(
-                                isThearUp,
-                                isThearDown
-                        );
-                    }).toList();
-        }else{
-            reviewThearUpDown = reviewInfoDtos.getContent()
-                    .stream().map(review -> {
-                        boolean isThearUp = false;
-                        boolean isThearDown = false;
-                        return ReviewThearUpDownCheckedDto.of(
-                                isThearUp,
-                                isThearDown
-                        );
-                    }).toList();
+            reviewInfos = reviews.getContent().stream().map(review -> {
+                boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member, review);
+                boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(member, review);
+
+                //로그인 한 경우
+                return ReviewInfoListDto.of(
+                        review.getMember().getId(),
+                        review.getMember().getName(),
+                        review.getMember().getProfileImage(),
+                        review.getMember().getTier().getImage(),
+                        review.getId(),
+                        review.getStarRate(),
+                        review.getContent(),
+                        review.getSpoiler(),
+                        review.getCommentCounts(),
+                        review.getThearUps(),
+                        review.getThearDowns(),
+                        isThearUp,
+                        isThearDown
+                );
+            }).toList();
+        }
+        else{
+            reviewInfos = reviews.getContent().stream().map(review -> {
+                //로그인 안한 경우
+                return ReviewInfoListDto.of(
+                        review.getMember().getId(),
+                        review.getMember().getName(),
+                        review.getMember().getProfileImage(),
+                        review.getMember().getTier().getImage(),
+                        review.getId(),
+                        review.getStarRate(),
+                        review.getContent(),
+                        review.getSpoiler(),
+                        review.getCommentCounts(),
+                        review.getThearUps(),
+                        review.getThearDowns(),
+                        false,
+                        false
+                );
+            }).toList();
         }
 
-        // 5) 리뷰 내용 조회 결과와 ThearUpDown 여부 dto 생성
-        ReviewByMovieIdListDto reviewByMovieIdListDto = ReviewByMovieIdListDto.of(
-                reviewRepository.getReviewInfosByMovieId(movieId, pageable),
-                reviewThearUpDown
-        );
+        // 5) Page로 변환
+        Page<ReviewInfoListDto> reviewInfoList = new PageImpl<>(reviewInfos, pageable, reviews.getTotalElements());
 
-        return MovieDetailResponse.of(movie, reviewCountListDto, reviewByMovieIdListDto);
+        return MovieDetailResponse.of(movie, reviewCountListDto, reviewInfoList);
     }
 
     public MovieWithRatingListResponse getMoviesByHighestRatingThisWeek() {
