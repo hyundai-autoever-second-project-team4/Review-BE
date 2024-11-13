@@ -2,9 +2,12 @@ package hyundai.movie_review.movie.service;
 
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.movie.dto.MovieDetailResponse;
+import hyundai.movie_review.movie.dto.MovieWithRatingListResponse;
+import hyundai.movie_review.movie.dto.MovieWithRatingInfoDto;
 import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.movie.exception.MovieIdNotFoundException;
 import hyundai.movie_review.movie.repository.MovieRepository;
+import hyundai.movie_review.review.dto.ReviewCountListDto;
 import hyundai.movie_review.review.dto.*;
 import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.review.exception.ReviewIdNotFoundException;
@@ -35,9 +38,10 @@ public class MovieService {
         // 1) 영화 id에 해당하는 영화 정보 조회
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(MovieIdNotFoundException::new);
-        // 2) 영화 id에 해당하는 리뷰 별점 조회
-        ReviewCountListDto reviewCountListDto = ReviewCountListDto.of(
-                reviewRepository.getReviewCountsByMovieId(movieId));
+        // 2) 영화 id에 해당하는 리뷰 조회
+        ReviewCountListDto reviewCountListDto =
+                reviewRepository.getReviewCountsByMovieId(movieId);
+
         // 3) 영화 id에 해당하는 리뷰 내용 조회
         Page<ReviewByMovieIdDto> reviewInfoDtos = reviewRepository.getReviewInfosByMovieId(movieId, pageable);
 
@@ -78,9 +82,17 @@ public class MovieService {
         return MovieDetailResponse.of(movie, reviewCountListDto, reviewByMovieIdListDto);
     }
 
-    private void validateMovieExists(Long movieId) {
-        if (!movieRepository.existsById(movieId)) {
-            throw new MovieIdNotFoundException();
-        }
+    public MovieWithRatingListResponse getMoviesByHighestRatingThisWeek() {
+        // 1) 이번 주 기준으로 별점 높은 영화들 가져오기
+        List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findMoviesByHighestRatingThisWeek();
+
+        return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
     }
+
+    public MovieWithRatingListResponse getMostReviewedMoviesThisWeek() {
+        List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findMoviesByMostReviewsThisWeek();
+
+        return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
+    }
+
 }

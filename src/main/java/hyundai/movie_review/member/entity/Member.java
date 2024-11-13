@@ -3,7 +3,6 @@ package hyundai.movie_review.member.entity;
 import hyundai.movie_review.badge.entity.Badge;
 import hyundai.movie_review.comment.entity.Comment;
 import hyundai.movie_review.member_badge.entity.MemberBadge;
-import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.security.model.MemberRole;
 import hyundai.movie_review.thear_down.entity.ThearDown;
 import hyundai.movie_review.thear_up.entity.ThearUp;
@@ -32,7 +31,7 @@ public class Member {
     private Long id;
 
     // badge와 연결
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "badge_id")
     private Badge badge;
 
@@ -57,6 +56,7 @@ public class Member {
     @Builder.Default
     private Set<MemberRole> memberRoles = new HashSet<>();
 
+
     public void addRole(MemberRole role) {
         this.memberRoles.add(role);
     }
@@ -64,6 +64,7 @@ public class Member {
     public void setTier(Tier tier) {
         this.tier = tier;
     }
+
     public void setBadge(Badge badge) {
         this.badge = badge;
     }
