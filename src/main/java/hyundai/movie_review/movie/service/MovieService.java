@@ -39,9 +39,4 @@ public class MovieService {
         return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
     }
 
-    private void validateMovieExists(Long movieId) {
-        if (!movieRepository.existsById(movieId)) {
-            throw new MovieIdNotFoundException();
-        }
-    }
 }
