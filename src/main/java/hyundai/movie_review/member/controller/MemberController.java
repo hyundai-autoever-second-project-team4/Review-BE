@@ -26,7 +26,7 @@ public class MemberController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MovieDetailResponse.class))),
+                            schema = @Schema(implementation = MemberInfoResponse.class))),
             @ApiResponse(responseCode = "401", description = "사용자 인증 오류",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = BusinessExceptionResponse.class))),
