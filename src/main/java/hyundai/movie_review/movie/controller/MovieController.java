@@ -1,11 +1,8 @@
 package hyundai.movie_review.movie.controller;
 
-import hyundai.movie_review.exception.BusinessExceptionResponse;
 import hyundai.movie_review.movie.dto.MovieDetailResponse;
-import hyundai.movie_review.movie.entity.Movie;
+import hyundai.movie_review.movie.dto.MovieWithRatingListResponse;
 import hyundai.movie_review.movie.service.MovieService;
-import hyundai.movie_review.review.dto.ReviewCreateResponse;
-import hyundai.movie_review.review.dto.ReviewDeleteResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,4 +37,20 @@ public class MovieController {
         MovieDetailResponse response = movieService.getMovieDetail(movieId);
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "이번 주 별점 높은 영화 조회", description = "이번 주 기준으로 별점이 높은 영화 순으로 정렬하여 조회하여 리턴합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이번 주 별점 순 영화 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MovieWithRatingListResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content())
+    })
+    @GetMapping("/movie/top-rated/weekly")
+    public ResponseEntity<?> getHotStarRate() {
+        MovieWithRatingListResponse response = movieService.getMovieStarRate();
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }
