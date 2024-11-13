@@ -112,6 +112,37 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
                         movie.totalStarRate.desc(),
                         movie.totalReviewCount.desc()
                 )
+                .limit(10)
+                .fetch();
+    }
+
+    @Override
+    public List<MovieWithRatingInfoDto> findHonorBoardMovies() {
+        QMovie movie = QMovie.movie;
+        QReview review = QReview.review;
+
+        return queryFactory
+                .select(Projections.constructor(MovieWithRatingInfoDto.class,
+                        movie.id,
+                        movie.title,
+                        movie.overview,
+                        movie.posterPath,
+                        movie.backdropPath,
+                        movie.adult,
+                        movie.releaseDate,
+                        movie.runtime,
+                        movie.originCountry,
+                        review.count().as("totalReviewCount"),
+                        review.starRate.avg().as("averageStarRate")
+                ))
+                .from(movie)
+                .join(review).on(review.movie.id.eq(movie.id))
+                .groupBy(movie.id)
+                .orderBy(
+                        review.count().desc(),       // 리뷰 수가 많은 순
+                        review.starRate.avg().desc() // 별점이 높은 순
+                )
+                .limit(10)
                 .fetch();
     }
 
