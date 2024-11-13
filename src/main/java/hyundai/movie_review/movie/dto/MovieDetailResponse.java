@@ -6,6 +6,7 @@ import hyundai.movie_review.director.dto.DirectorInfoListDto;
 import hyundai.movie_review.gallery.entity.dto.GalleryInfoListDto;
 import hyundai.movie_review.genre.dto.GenreInfoListDto;
 import hyundai.movie_review.movie.entity.Movie;
+import hyundai.movie_review.review.dto.ReviewByMovieIdListDto;
 import hyundai.movie_review.review.dto.ReviewCountListDto;
 import hyundai.movie_review.tag.dto.TagInfoListDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,10 +35,12 @@ public record MovieDetailResponse(
         TagInfoListDto tagInfoList,
 
         @Schema(description = "영화에 대한 리뷰 정보 목록")
-        ReviewCountListDto reviewCountList
+        ReviewCountListDto reviewCountList,
+
+        ReviewByMovieIdListDto reviewByMovieIdListDto
 ) {
 
-    public static MovieDetailResponse of(Movie movie, ReviewCountListDto reviewCountListDto) {
+    public static MovieDetailResponse of(Movie movie, ReviewCountListDto reviewCountListDto, ReviewByMovieIdListDto reviewByMovieIdListDto) {
         return new MovieDetailResponse(
                 movie.getId(),
                 MovieInfoDto.of(movie),
@@ -46,7 +49,8 @@ public record MovieDetailResponse(
                 GalleryInfoListDto.of(movie.getGalleries()),
                 GenreInfoListDto.of(movie.getGenres()),
                 TagInfoListDto.of(movie.getTags()),
-                reviewCountListDto
+                reviewCountListDto,
+                reviewByMovieIdListDto
         );
     }
 

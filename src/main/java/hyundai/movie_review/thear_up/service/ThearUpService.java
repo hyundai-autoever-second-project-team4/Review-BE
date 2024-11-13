@@ -1,6 +1,9 @@
 package hyundai.movie_review.thear_up.service;
 
 import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.review.entity.Review;
+import hyundai.movie_review.review.exception.ReviewIdNotFoundException;
+import hyundai.movie_review.review.repository.ReviewRepository;
 import hyundai.movie_review.security.MemberResolver;
 import hyundai.movie_review.thear_up.dto.ThearUpResponse;
 import hyundai.movie_review.thear_up.entity.ThearUp;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ThearUpService {
 
     private final ThearUpRepository thearUpRepository;
+    private final ReviewRepository reviewRepository;
     private final MemberResolver memberResolver;
 
     //1. 지금 좋아요를 누른 맴버의 아이디와 리뷰의 맴버 아이디가 같은 것을 찾기?
@@ -27,6 +31,10 @@ public class ThearUpService {
         // 1) 현재 로그인한 멤버를 가져오기.
         Member currentMember = memberResolver.getCurrentMember();
 
+        // 2) 리뷰 가져오기
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(ReviewIdNotFoundException::new);
+
         /* TODO
             전제] 현재 멤버 : 1, 리뷰 : 1
             1) 내가 1번이고, 리뷰 1번에 ThearUpRepository에 해당 record가 있으면 -> thearup 삭제
@@ -36,9 +44,9 @@ public class ThearUpService {
         * */
 
         // 이미 좋아요가 있는 경우 -> exists(true)
-        if (thearUpRepository.existsByMemberIdAndReviewId(currentMember.getId(), reviewId)) {
+        if (thearUpRepository.existsByMemberIdAndReviewId(currentMember, review)) {
             // 이미 좋아요가 있으면 삭제 (좋아요 취소)
-            thearUpRepository.deleteByMemberIdAndReviewId(currentMember.getId(), reviewId);
+            thearUpRepository.deleteByMemberIdAndReviewId(currentMember, review);
 
             log.info("좋아요 삭제 완료");
 
@@ -46,8 +54,8 @@ public class ThearUpService {
         } else {
             // 좋아요가 없으면 새로 생성
             ThearUp thearUp = ThearUp.builder()
-                    .memberId(currentMember.getId())
-                    .reviewId(reviewId)
+                    .memberId(currentMember)
+                    .reviewId(review)
                     .build();
 
             log.info("좋아요 생성 완료");
