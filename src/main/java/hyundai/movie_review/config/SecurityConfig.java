@@ -2,7 +2,6 @@ package hyundai.movie_review.config;
 
 import hyundai.movie_review.security.authentication.CustomUserDetailService;
 import hyundai.movie_review.security.authentication.JwtAuthenticationFilter;
-import hyundai.movie_review.security.authentication.JwtTokenProvider;
 import hyundai.movie_review.security.handler.CustomAuthenticationSuccessHandler;
 import java.util.Arrays;
 import java.util.Collections;
