@@ -39,4 +39,10 @@ public class MovieService {
         return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
     }
 
+    public MovieWithRatingListResponse getMostReviewedMoviesThisWeek() {
+        List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findMoviesByMostReviewsThisWeek();
+
+        return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
+    }
+
 }

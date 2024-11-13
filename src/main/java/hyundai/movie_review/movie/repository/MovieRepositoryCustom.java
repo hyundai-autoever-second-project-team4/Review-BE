@@ -8,4 +8,6 @@ public interface MovieRepositoryCustom {
 
     List<MovieWithRatingInfoDto> findMoviesByHighestRatingThisWeek();
 
+    List<MovieWithRatingInfoDto> findMoviesByMostReviewsThisWeek();
+
 }

@@ -49,4 +49,36 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
                 .limit(10)
                 .fetch();
     }
+
+    @Override
+    public List<MovieWithRatingInfoDto> findMoviesByMostReviewsThisWeek() {
+        QMovie movie = QMovie.movie;
+        QReview review = QReview.review;
+
+        LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+        LocalDateTime endDate = LocalDateTime.now();
+
+        return queryFactory
+                .select(Projections.constructor(MovieWithRatingInfoDto.class,
+                        movie.id,
+                        movie.title,
+                        movie.overview,
+                        movie.posterPath,
+                        movie.backdropPath,
+                        movie.adult,
+                        movie.releaseDate,
+                        movie.runtime,
+                        movie.originCountry,
+                        review.count().as("totalReviewCount"),
+                        review.starRate.avg().as("averageStarRate")
+                ))
+                .from(movie)
+                .join(review).on(review.movieId.eq(movie.id))
+                .where(review.createdAt.between(startDate, endDate)
+                        .and(review.deleted.isFalse()))
+                .groupBy(movie.id)
+                .orderBy(review.count().desc(), review.starRate.avg().desc()) // 리뷰 수 -> 평균 별점 순 정렬
+                .limit(10)
+                .fetch();
+    }
 }
