@@ -46,8 +46,22 @@ public class MovieController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content())
     })
     @GetMapping("/movie/top-rated/weekly")
-    public ResponseEntity<?> getHotStarRate() {
-        MovieWithRatingListResponse response = movieService.getMovieStarRate();
+    public ResponseEntity<?> getMoviesByHighestRatingThisWeek() {
+        MovieWithRatingListResponse response = movieService.getMoviesByHighestRatingThisWeek();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "이번 주 리뷰 많은 영화 조회", description = "이번 주 기준으로 리뷰가 많은 영화 순으로 정렬하여 조회하여 리턴합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이번 주 리뷰 순 영화 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MovieWithRatingListResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content())
+    })
+    @GetMapping("/movie/most-reviewed/weekly")
+    public ResponseEntity<?> getMostReviewedMoviesThisWeek() {
+        MovieWithRatingListResponse response = movieService.getMostReviewedMoviesThisWeek();
 
         return ResponseEntity.ok(response);
     }

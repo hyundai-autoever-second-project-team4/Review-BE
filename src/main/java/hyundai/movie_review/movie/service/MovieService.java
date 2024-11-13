@@ -32,9 +32,15 @@ public class MovieService {
         return MovieDetailResponse.of(movie, reviewCountListDto);
     }
 
-    public MovieWithRatingListResponse getMovieStarRate() {
+    public MovieWithRatingListResponse getMoviesByHighestRatingThisWeek() {
         // 1) 이번 주 기준으로 별점 높은 영화들 가져오기
         List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findMoviesByHighestRatingThisWeek();
+
+        return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
+    }
+
+    public MovieWithRatingListResponse getMostReviewedMoviesThisWeek() {
+        List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findMoviesByMostReviewsThisWeek();
 
         return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
     }
