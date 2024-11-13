@@ -45,7 +45,7 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
                 .where(review.createdAt.between(startDate, endDate)
                         .and(review.deleted.isFalse()))
                 .groupBy(movie.id)
-                .orderBy(review.starRate.avg().desc())
+                .orderBy(review.starRate.avg().desc(), review.count().desc()) // 평균 별점 -> 리뷰 개수 순 정렬
                 .limit(10)
                 .fetch();
     }
