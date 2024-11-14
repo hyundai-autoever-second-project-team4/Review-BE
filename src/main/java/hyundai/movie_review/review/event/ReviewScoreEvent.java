@@ -7,12 +7,14 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public class ReviewScoreEvent extends ApplicationEvent {
 
-    private final Member member;
-    private final long scoreChange;
+    private static final long REVIEW_SCORE_VALUE = 10;
 
-    public ReviewScoreEvent(Object source, Member member, long scoreChange) {
+    private final Member member;
+    private final long scoreAdjustment;
+
+    public ReviewScoreEvent(Object source, Member member, boolean isCreated) {
         super(source);
         this.member = member;
-        this.scoreChange = scoreChange;
+        this.scoreAdjustment = isCreated ? REVIEW_SCORE_VALUE : -REVIEW_SCORE_VALUE;
     }
 }

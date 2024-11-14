@@ -10,6 +10,7 @@ import hyundai.movie_review.review.dto.ReviewDeleteResponse;
 import hyundai.movie_review.review.dto.ReviewInfoDto;
 import hyundai.movie_review.review.dto.ReviewInfoListDto;
 import hyundai.movie_review.review.entity.Review;
+import hyundai.movie_review.review.event.ReviewScoreEvent;
 import hyundai.movie_review.review.exception.ReviewAlreadyExistsException;
 import hyundai.movie_review.review.exception.ReviewAuthorMismatchException;
 import hyundai.movie_review.review.exception.ReviewIdNotFoundException;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ public class ReviewService {
     private final MemberResolver memberResolver;
     private final ThearUpRepository thearUpRepository;
     private final ThearDownRepository thearDownRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
 
     public ReviewInfoListDto getHotReviews() {
@@ -112,6 +115,9 @@ public class ReviewService {
 
         log.info("Review 생성 성공 : {}", savedReview.getId());
 
+        // 8) 작성한 리뷰 정보에 대한 점수를 반영하기 위한 event 등록
+        applicationEventPublisher.publishEvent(new ReviewScoreEvent(this, currentMember, true));
+
         return ReviewCreateResponse.of(savedReview);
     }
 
@@ -144,6 +150,9 @@ public class ReviewService {
         // 6) 삭제 사항 반영
         reviewRepository.save(review);
         movieRepository.save(movie);
+
+        // 7) 삭제한 리뷰에 대한 점수를 반영하기 위한 event 등록
+        applicationEventPublisher.publishEvent(new ReviewScoreEvent(this, currentMember, false));
 
         return ReviewDeleteResponse.of(review);
     }
