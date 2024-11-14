@@ -7,13 +7,19 @@ import hyundai.movie_review.movie.repository.MovieRepository;
 import hyundai.movie_review.review.dto.ReviewCreateRequest;
 import hyundai.movie_review.review.dto.ReviewCreateResponse;
 import hyundai.movie_review.review.dto.ReviewDeleteResponse;
+import hyundai.movie_review.review.dto.ReviewInfoDto;
+import hyundai.movie_review.review.dto.ReviewInfoListDto;
 import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.review.exception.ReviewAlreadyExistsException;
 import hyundai.movie_review.review.exception.ReviewAuthorMismatchException;
 import hyundai.movie_review.review.exception.ReviewIdNotFoundException;
 import hyundai.movie_review.review.repository.ReviewRepository;
 import hyundai.movie_review.security.MemberResolver;
+import hyundai.movie_review.thear_down.repository.ThearDownRepository;
+import hyundai.movie_review.thear_up.repository.ThearUpRepository;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +33,48 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MovieRepository movieRepository;
     private final MemberResolver memberResolver;
+    private final ThearUpRepository thearUpRepository;
+    private final ThearDownRepository thearDownRepository;
+
+
+    public ReviewInfoListDto getHotReviews() {
+        // 현재 로그인 한 멤버인지 확인
+        boolean isLoggedIn = memberResolver.isAuthenticated();
+
+        // 현재 가장 hot한 리뷰들 조회
+        List<Review> hotReviews = reviewRepository.getReviewsOrderByThearUpCountDesc();
+
+        List<ReviewInfoDto> reviewInfoList;
+        if (isLoggedIn) {
+            Member member = memberResolver.getCurrentMember();
+            reviewInfoList = hotReviews.stream()
+                    .map(review -> {
+                        boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member,
+                                review);
+                        boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(
+                                member,
+                                review);
+                        return ReviewInfoDto.of(
+                                review,
+                                isThearUp,
+                                isThearDown
+                        );
+                    }).toList();
+        } else {
+            reviewInfoList = hotReviews.stream()
+                    .map(review -> {
+                        //로그인 안한 경우
+                        return ReviewInfoDto.of(
+                                review,
+                                false,
+                                false
+                        );
+                    }).toList();
+        }
+
+        return ReviewInfoListDto.of(reviewInfoList);
+    }
+
 
     @Transactional
     public ReviewCreateResponse createReview(ReviewCreateRequest request) {
@@ -113,4 +161,6 @@ public class ReviewService {
             throw new ReviewAuthorMismatchException();
         }
     }
+
+
 }

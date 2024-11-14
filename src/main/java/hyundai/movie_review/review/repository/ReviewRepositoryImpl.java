@@ -3,8 +3,10 @@ package hyundai.movie_review.review.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hyundai.movie_review.review.dto.ReviewCountDto;
 import hyundai.movie_review.review.dto.ReviewCountListDto;
+import hyundai.movie_review.review.dto.ReviewInfoListDto;
 import hyundai.movie_review.review.entity.QReview;
 import hyundai.movie_review.review.entity.Review;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,6 +52,22 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
                 .orElse(0.0);
 
         return ReviewCountListDto.of(totalReviewCount, averageStarRate, reviewCounts);
+    }
+
+    @Override
+    public List<Review> getReviewsOrderByThearUpCountDesc() {
+        QReview review = QReview.review;
+
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+
+        return queryFactory
+                .selectFrom(review)
+                .where(review.createdAt.between(yesterday.atStartOfDay(), today.atStartOfDay())
+                        .and(review.deleted.isFalse()))
+                .orderBy(review.thearUps.size().desc(), review.starRate.desc())
+                .limit(10)
+                .fetch();
     }
 
 }
