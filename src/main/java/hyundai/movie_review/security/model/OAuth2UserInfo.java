@@ -4,11 +4,7 @@ import hyundai.movie_review.member.entity.Member;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import hyundai.movie_review.tier.entity.Tier;
-import hyundai.movie_review.tier.exception.TierIdNotFound;
-import hyundai.movie_review.tier.repository.TierRepository;
 import lombok.Builder;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Builder
 public record OAuth2UserInfo(
