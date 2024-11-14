@@ -1,5 +1,6 @@
 package hyundai.movie_review.score;
 
+import hyundai.movie_review.badge.event.BadgeAwardEvent;
 import hyundai.movie_review.comment.event.CommentScoreEvent;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.repository.MemberRepository;
@@ -11,6 +12,7 @@ import hyundai.movie_review.tier.exception.TierIdNotFoundException;
 import hyundai.movie_review.tier.repository.TierRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class ScoreEventListener {
 
     private final TierRepository tierRepository;
     private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @EventListener
     @Transactional
@@ -64,6 +67,8 @@ public class ScoreEventListener {
 
         log.info("Member ID: {} - 업데이트된 티어 to: {} 기존 점수 : {}", member.getId(),
                 newTier.getName(), newScore);
+
+        applicationEventPublisher.publishEvent(new BadgeAwardEvent(this, member));
     }
 
 

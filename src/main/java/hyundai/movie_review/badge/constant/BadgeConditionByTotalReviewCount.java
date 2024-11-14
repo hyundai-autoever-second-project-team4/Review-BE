@@ -1,5 +1,7 @@
 package hyundai.movie_review.badge.constant;
 
+import hyundai.movie_review.tier.constant.TierLevel;
+import java.util.Optional;
 import lombok.Getter;
 
 // 리뷰 수에 따라 달성되는 배지 조건을 정의
@@ -19,5 +21,15 @@ public enum BadgeConditionByTotalReviewCount {
         this.badgeId = badgeId;
         this.description = description;
         this.threshold = threshold;
+    }
+
+    public static Optional<BadgeConditionByTotalReviewCount> getBadgeByReviewCount(
+            long reviewCount) {
+        for (BadgeConditionByTotalReviewCount badgeCondition : BadgeConditionByTotalReviewCount.values()) {
+            if (reviewCount == badgeCondition.getThreshold()) {
+                return Optional.of(badgeCondition);
+            }
+        }
+        return Optional.empty();
     }
 }
