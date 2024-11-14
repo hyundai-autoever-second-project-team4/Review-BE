@@ -1,8 +1,10 @@
 package hyundai.movie_review.review.event;
 
 import hyundai.movie_review.member.entity.Member;
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+@Getter
 public class ReviewScoreEvent extends ApplicationEvent {
 
     private final Member member;
