@@ -5,4 +5,8 @@ import java.util.List;
 public record ReviewInfoListDto(
         List<ReviewInfoDto> reviewInfos
 ) {
+
+    public static ReviewInfoListDto of(List<ReviewInfoDto> reviewInfos) {
+        return new ReviewInfoListDto(reviewInfos);
+    }
 }

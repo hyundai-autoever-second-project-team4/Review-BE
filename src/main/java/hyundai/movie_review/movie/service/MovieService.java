@@ -58,17 +58,7 @@ public class MovieService {
 
                 //로그인 한 경우
                 return ReviewInfoDto.of(
-                        review.getMember().getId(),
-                        review.getMember().getName(),
-                        review.getMember().getProfileImage(),
-                        review.getMember().getTier().getImage(),
-                        review.getId(),
-                        review.getStarRate(),
-                        review.getContent(),
-                        review.getSpoiler(),
-                        review.getThearUps(),
-                        review.getThearDowns(),
-                        review.getCommentCounts(),
+                        review,
                         isThearUp,
                         isThearDown
                 );
@@ -77,24 +67,14 @@ public class MovieService {
             reviewInfoList = reviews.stream().map(review -> {
                 //로그인 안한 경우
                 return ReviewInfoDto.of(
-                        review.getMember().getId(),
-                        review.getMember().getName(),
-                        review.getMember().getProfileImage(),
-                        review.getMember().getTier().getImage(),
-                        review.getId(),
-                        review.getStarRate(),
-                        review.getContent(),
-                        review.getSpoiler(),
-                        review.getThearUps(),
-                        review.getThearDowns(),
-                        review.getCommentCounts(),
+                        review,
                         false,
                         false
                 );
             }).toList();
         }
 
-        ReviewInfoListDto reviewInfoListDto = new ReviewInfoListDto(reviewInfoList);
+        ReviewInfoListDto reviewInfoListDto = ReviewInfoListDto.of(reviewInfoList);
 
         return MovieDetailResponse.of(movie, reviewCountListDto, reviewInfoListDto);
     }
