@@ -3,6 +3,7 @@ package hyundai.movie_review.badge.event;
 import hyundai.movie_review.badge.constant.BadgeConditionByBadgeCount;
 import hyundai.movie_review.badge.constant.BadgeConditionByGenreCount;
 import hyundai.movie_review.badge.constant.BadgeConditionBySpecificReview;
+import hyundai.movie_review.badge.constant.BadgeConditionByThearUpCount;
 import hyundai.movie_review.badge.constant.BadgeConditionByTotalReviewCount;
 import hyundai.movie_review.badge.entity.Badge;
 import hyundai.movie_review.badge.exception.BadgeIdNotFoundException;
@@ -14,6 +15,7 @@ import hyundai.movie_review.member_badge.entity.MemberBadge;
 import hyundai.movie_review.member_badge.repository.MemberBadgeRepository;
 import hyundai.movie_review.movie.vo.MovieGenreCountMap;
 import hyundai.movie_review.movie_genre.entity.MovieGenre;
+import hyundai.movie_review.review.entity.Review;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,8 +43,24 @@ public class BadgeEventListener {
         handleBadgeAwardByReviewCount(member);  // 총 리뷰 카운트에 대한 뱃지 어워드
         handleBadgeAwardByBadgeCount(member);   // 총 뱃지 카운트에 대한 뱃지 어워드
         handleBadgeAwardByGenreCount(member);   // 작성한 리뷰 기반 장르 카운트에 대한 뱃지 어워드
-        handleBadgeAwardBySpecificReview(member);   // 특정 리뷰에 대한 이벤트 뱃지 어워드
+        handleBadgeAwardBySpecificReview(member);   // 특정 리뷰에 대한 뱃지 어워드
+        handleBadgeAwardByThearUpCount(member); // 받은 띠어럽 카운트에 대한  뱃지 어워드
+    }
 
+    private void handleBadgeAwardByThearUpCount(Member member) {
+        long totalThearUpCount = member.getReviews().stream()
+                .filter(review -> !review.getDeleted()) // 삭제되지 않은 리뷰만 포함
+                .mapToLong(Review::getThearUps) // 각 리뷰의 thearUps 값을 long으로 매핑
+                .sum(); // 합산
+
+        log.info("총 받은 띠어럽 수 : {}", totalThearUpCount);
+
+        // 가장 높은 조건 하나를 가져와 배지 수여
+        BadgeConditionByThearUpCount.getHighestConditionByThearUpCount(totalThearUpCount)
+                .ifPresent(condition -> {
+                    log.info("[SUCCESS] 리뷰 UP 총 합계 조건 충족: {}", condition.getDescription());
+                    awardBadgeIfNotReceived(member, condition.getBadgeId());
+                });
     }
 
     private void handleBadgeAwardBySpecificReview(Member member) {
