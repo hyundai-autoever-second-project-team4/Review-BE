@@ -7,10 +7,10 @@ import java.util.List;
 
 public record BadgeMyPageInfoDto(
         @Schema(description = "대표 배지 ID", example = "1")
-        Long badgeId,
+        Long primaryBadgeId,
 
         @Schema(description = "대표 배지 설정 시 사용자 배경 이미지 경로")
-        String badgeBackgroundImg,
+        String primaryBadgeBackgroundImg,
 
         @Schema(description = "배지 목록")
         List<BadgeInfoDto> badges

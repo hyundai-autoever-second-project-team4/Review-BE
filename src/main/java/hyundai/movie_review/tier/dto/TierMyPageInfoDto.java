@@ -21,18 +21,18 @@ public record TierMyPageInfoDto (
 
         // Lv 1 ~ 3은 다음 티어/레벨까지 100 포인트 필요
         if(tier.getId() == 1){ requiredPoints = 100; currentPoints = score; }
-        else if(tier.getId() == 2){ requiredPoints = 100; currentPoints = score-101; }
-        else if(tier.getId() == 3){ requiredPoints = 100; currentPoints = score-201; }
+        else if(tier.getId() == 2){ requiredPoints = 100; currentPoints = score-100; }
+        else if(tier.getId() == 3){ requiredPoints = 100; currentPoints = score-200; }
         // Lv 4 ~ 5은 다음 티어/레벨까지 200 포인트 필요
-        else if(tier.getId() == 4){ requiredPoints = 200; currentPoints = score-301; }
-        else if(tier.getId() == 5){ requiredPoints = 200; currentPoints = score-501; }
+        else if(tier.getId() == 4){ requiredPoints = 200; currentPoints = score-300; }
+        else if(tier.getId() == 5){ requiredPoints = 200; currentPoints = score-500; }
         // Lv 6은 다음 티어/레벨까지 300 포인트 필요
-        else if(tier.getId() == 6){ requiredPoints = 300; currentPoints = score-701; }
+        else if(tier.getId() == 6){ requiredPoints = 300; currentPoints = score-700; }
         // Lv 7 ~ 8은 다음 티어/레벨까지 500 포인트 필요
-        else if(tier.getId() == 7){ requiredPoints = 500; currentPoints = score-1001; }
-        else if(tier.getId() == 8){ requiredPoints = 500; currentPoints = score-1501; }
+        else if(tier.getId() == 7){ requiredPoints = 500; currentPoints = score-1000; }
+        else if(tier.getId() == 8){ requiredPoints = 500; currentPoints = score-1500; }
         // Lv 9은 다음 티어/레벨까지 3000 포인트 필요
-        else if(tier.getId() == 9){ requiredPoints = 3000; currentPoints = score-2001; }
+        else if(tier.getId() == 9){ requiredPoints = 3000; currentPoints = score-2000; }
         // Lv 10이 마지막
         else { requiredPoints = 3000; currentPoints = requiredPoints; }
 
