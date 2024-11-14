@@ -1,5 +1,7 @@
 package hyundai.movie_review.badge.constant;
 
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.Getter;
 
 @Getter
@@ -14,5 +16,12 @@ public enum BadgeConditionByThearDownCount {
         this.badgeId = badgeId;
         this.description = description;
         this.threshold = threshold;
+    }
+
+    public static Optional<BadgeConditionByThearDownCount> getHighestConditionByThearDownCount(
+            long thearDownCount) {
+        return Arrays.stream(values())
+                .filter(condition -> thearDownCount == condition.getThreshold())
+                .findFirst();
     }
 }

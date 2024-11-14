@@ -5,6 +5,7 @@ import hyundai.movie_review.comment.event.CommentScoreEvent;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.repository.MemberRepository;
 import hyundai.movie_review.review.event.ReviewScoreEvent;
+import hyundai.movie_review.thear_down.event.ThearDownScoreEvent;
 import hyundai.movie_review.thear_up.event.ThearUpScoreEvent;
 import hyundai.movie_review.tier.constant.TierLevel;
 import hyundai.movie_review.tier.entity.Tier;
@@ -46,6 +47,14 @@ public class ScoreEventListener {
         updateMemberTier(event.getMember(), event.getScoreAdjustment());
         log.info("띠어럽 이벤트 처리완료");
     }
+
+    @EventListener
+    @Transactional
+    public void handleThearDownScoreEvent(ThearDownScoreEvent event) {
+        updateMemberTier(event.getMember(), event.getScoreAdjustment());
+        log.info("띠어다운 이벤트 처리 완료");
+    }
+
 
     private void updateMemberTier(Member member, long scoreChange) {
         // 점수 업데이트
