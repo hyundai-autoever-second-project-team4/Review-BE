@@ -1,5 +1,6 @@
 package hyundai.movie_review.score;
 
+import hyundai.movie_review.comment.event.CommentScoreEvent;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.repository.MemberRepository;
 import hyundai.movie_review.review.event.ReviewScoreEvent;
@@ -24,6 +25,12 @@ public class ScoreEventListener {
     @EventListener
     @Transactional
     public void handleReviewScoreEvent(ReviewScoreEvent event) {
+        updateMemberTier(event.getMember(), event.getScoreAdjustment());
+    }
+
+    @EventListener
+    @Transactional
+    public void handleCommentScoreEvent(CommentScoreEvent event) {
         updateMemberTier(event.getMember(), event.getScoreAdjustment());
     }
 
