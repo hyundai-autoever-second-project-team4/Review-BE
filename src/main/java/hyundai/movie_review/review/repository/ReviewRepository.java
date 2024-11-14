@@ -1,5 +1,6 @@
 package hyundai.movie_review.review.repository;
 
+import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.review.entity.Review;
 
@@ -20,4 +21,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
     @Query("SELECT r FROM Review r LEFT JOIN r.thearUps t WHERE r.movie.id = :movieId AND r.deleted = false "
             + "GROUP BY r.id ORDER BY COUNT(t) DESC")
     List<Review> findByMovieId(@Param("movieId") Long movieId, Pageable pageable);
+
+    List<Review> findByMemberIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
 }

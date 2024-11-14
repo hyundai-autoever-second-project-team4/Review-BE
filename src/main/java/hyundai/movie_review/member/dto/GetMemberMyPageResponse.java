@@ -4,6 +4,7 @@ import hyundai.movie_review.badge.dto.BadgeMyPageInfoDto;
 import hyundai.movie_review.genre.dto.GenreCountListDto;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.review.dto.ReviewCountArrayDto;
+import hyundai.movie_review.review.dto.ReviewInfoListDto;
 import hyundai.movie_review.tier.dto.TierMyPageInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -25,9 +26,13 @@ public record GetMemberMyPageResponse(
    GenreCountListDto genreList,
 
    @Schema(description = "멤버가 작성한 리뷰의 별점 분포")
-   ReviewCountArrayDto starRateList
+   ReviewCountArrayDto starRateList,
+
+   @Schema(description = "멤버가 작성한 리뷰 정보")
+   ReviewInfoListDto reviewInfoList
 ) {
-   public static GetMemberMyPageResponse of(Member member, GenreCountListDto genreList, ReviewCountArrayDto starRateList){
+   public static GetMemberMyPageResponse of(Member member, GenreCountListDto genreList,
+                                            ReviewCountArrayDto starRateList, ReviewInfoListDto reviewInfoList){
 
       return new GetMemberMyPageResponse(
               member.getName(),
@@ -35,7 +40,8 @@ public record GetMemberMyPageResponse(
               BadgeMyPageInfoDto.of(member),
               TierMyPageInfoDto.of(member.getTier(), member.getTotalScore()),
               genreList,
-              starRateList
+              starRateList,
+              reviewInfoList
       );
    }
 }
