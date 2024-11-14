@@ -70,7 +70,7 @@ public class Member {
     }
 
     public void updateScore(long score) {
-        this.totalScore += score;
+        this.totalScore = score;
     }
 
 

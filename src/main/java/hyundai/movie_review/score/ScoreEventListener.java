@@ -1,0 +1,53 @@
+package hyundai.movie_review.score;
+
+import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.member.repository.MemberRepository;
+import hyundai.movie_review.review.event.ReviewScoreEvent;
+import hyundai.movie_review.tier.constant.TierLevel;
+import hyundai.movie_review.tier.entity.Tier;
+import hyundai.movie_review.tier.exception.TierIdNotFoundException;
+import hyundai.movie_review.tier.repository.TierRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class ScoreEventListener {
+
+    private final TierRepository tierRepository;
+    private final MemberRepository memberRepository;
+
+    @EventListener
+    @Transactional
+    public void handleReviewScoreEvent(ReviewScoreEvent event) {
+        updateMemberTier(event.getMember(), event.getScoreAdjustment());
+    }
+
+    private void updateMemberTier(Member member, long scoreChange) {
+        // 점수 업데이트
+        long newScore = member.getTotalScore() + scoreChange;
+        member.updateScore(newScore);
+
+        // 새로운 티어 결정
+        TierLevel newTierLevel = TierLevel.getTierByScore(newScore);
+
+        // Tier Repository에서 tier 정보 가져옴
+        Tier newTier = tierRepository.findById(newTierLevel.getId())
+                .orElseThrow(TierIdNotFoundException::new);
+
+        // 멤버 정보에 저장
+        member.setTier(newTier);
+
+        // 변경된 정보를 저장
+        memberRepository.save(member);
+
+        log.info("Member ID: {} - 업데이트된 티어 to: {} 기존 점수 : {}", member.getId(),
+                newTier.getName(), newScore);
+    }
+
+
+}
