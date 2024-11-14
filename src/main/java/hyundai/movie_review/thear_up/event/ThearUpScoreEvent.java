@@ -1,8 +1,10 @@
 package hyundai.movie_review.thear_up.event;
 
 import hyundai.movie_review.member.entity.Member;
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+@Getter
 public class ThearUpScoreEvent extends ApplicationEvent {
 
     private static final long THEAR_UP_SCORE_VALUE = 3;

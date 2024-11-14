@@ -4,6 +4,7 @@ import hyundai.movie_review.comment.event.CommentScoreEvent;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.repository.MemberRepository;
 import hyundai.movie_review.review.event.ReviewScoreEvent;
+import hyundai.movie_review.thear_up.event.ThearUpScoreEvent;
 import hyundai.movie_review.tier.constant.TierLevel;
 import hyundai.movie_review.tier.entity.Tier;
 import hyundai.movie_review.tier.exception.TierIdNotFoundException;
@@ -26,12 +27,21 @@ public class ScoreEventListener {
     @Transactional
     public void handleReviewScoreEvent(ReviewScoreEvent event) {
         updateMemberTier(event.getMember(), event.getScoreAdjustment());
+        log.info("리뷰 이벤트 처리완료");
     }
 
     @EventListener
     @Transactional
     public void handleCommentScoreEvent(CommentScoreEvent event) {
         updateMemberTier(event.getMember(), event.getScoreAdjustment());
+        log.info("댓글 이벤트 처리완료");
+    }
+
+    @EventListener
+    @Transactional
+    public void handleThearUpScoreEvent(ThearUpScoreEvent event) {
+        updateMemberTier(event.getMember(), event.getScoreAdjustment());
+        log.info("띠어럽 이벤트 처리완료");
     }
 
     private void updateMemberTier(Member member, long scoreChange) {
