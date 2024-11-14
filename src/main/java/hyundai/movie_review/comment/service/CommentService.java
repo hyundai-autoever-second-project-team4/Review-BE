@@ -2,6 +2,7 @@ package hyundai.movie_review.comment.service;
 
 import hyundai.movie_review.comment.dto.*;
 import hyundai.movie_review.comment.entity.Comment;
+import hyundai.movie_review.comment.event.CommentScoreEvent;
 import hyundai.movie_review.comment.exception.CommentIdNotFoundException;
 import hyundai.movie_review.comment.exception.CommentMemberIdValidationException;
 import hyundai.movie_review.comment.exception.MemberIdNotFoundException;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +36,7 @@ public class CommentService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final MemberResolver memberResolver;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public CommentCreateResponse createComment(CommentCreateRequest request) {
         // 1) 현재 api를 사용하는 멤버 정보를 가져온다.
@@ -57,7 +60,8 @@ public class CommentService {
 
         log.info("comment 생성 완료 , 멤버 이름 : {}, 코멘트 넘버 {}", member.getName(), savedComment.getId());
 
-        // 추가) comment entity -> dto로 변환하는 작업
+        // 4) 생성된 comment에 대한 event 처리
+        applicationEventPublisher.publishEvent(new CommentScoreEvent(this, member, true));
 
         return new CommentCreateResponse(
                 savedComment.getMemberId().getId(),
@@ -67,13 +71,13 @@ public class CommentService {
         );
     }
 
-    public CommentUpdateResponse updateComment(CommentUpdateRequest request){
+    public CommentUpdateResponse updateComment(CommentUpdateRequest request) {
         Member member = memberResolver.getCurrentMember();
 
         Comment comment = commentRepository.findById(request.commentId())
                 .orElseThrow(CommentIdNotFoundException::new);
 
-        if(member.getId() != comment.getMemberId().getId()){
+        if (member.getId() != comment.getMemberId().getId()) {
             throw new CommentMemberIdValidationException();
         }
 
@@ -105,16 +109,19 @@ public class CommentService {
 
         commentRepository.delete(comment);
 
+        applicationEventPublisher.publishEvent(new CommentScoreEvent(this, member, false));
+
         log.info("코멘트 삭제 완료!");
     }
 
     // 한 리뷰의 전체 댓글
-    public CommentGetAllResponse getAllComments(Long reviewId, Integer page){
+    public CommentGetAllResponse getAllComments(Long reviewId, Integer page) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(ReviewIdNotFoundException::new);
 
-        PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC, "createdAt"));
-        Page<Comment> commentList= commentRepository.findByReviewId(review, pageRequest);
+        PageRequest pageRequest = PageRequest.of(page, 10,
+                Sort.by(Sort.Direction.ASC, "createdAt"));
+        Page<Comment> commentList = commentRepository.findByReviewId(review, pageRequest);
 
         List<CommentGetResponse> comments = commentList.getContent().stream()
                 .map(
@@ -122,8 +129,10 @@ public class CommentService {
                             Member member = memberRepository.findById(comment.getMemberId().getId())
                                     .orElseThrow(MemberIdNotFoundException::new);
 
-                            MemberBadgeAndTierDto dto = memberRepository.getTierAndBadgeImgByMemberId(member.getId());
-                            log.info("{}", memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
+                            MemberBadgeAndTierDto dto = memberRepository.getTierAndBadgeImgByMemberId(
+                                    member.getId());
+                            log.info("{}",
+                                    memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
                             return new CommentGetResponse(
                                     comment.getId(),
                                     comment.getReviewId().getId(),
@@ -145,7 +154,7 @@ public class CommentService {
     }
 
     // 특정 댓글 get
-    public CommentGetResponse getComment(Long commentId){
+    public CommentGetResponse getComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(CommentIdNotFoundException::new);
 

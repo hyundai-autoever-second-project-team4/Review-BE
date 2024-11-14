@@ -69,6 +69,11 @@ public class Member {
         this.badge = badge;
     }
 
+    public void updateScore(long score) {
+        this.totalScore = score;
+    }
+
+
     // MemberBadge와 연결
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
     private List<MemberBadge> memberBadges;

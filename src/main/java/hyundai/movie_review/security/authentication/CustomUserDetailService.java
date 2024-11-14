@@ -9,7 +9,7 @@ import hyundai.movie_review.member_badge.entity.MemberBadge;
 import hyundai.movie_review.member_badge.repository.MemberBadgeRepository;
 import hyundai.movie_review.security.model.OAuth2UserInfo;
 import hyundai.movie_review.tier.entity.Tier;
-import hyundai.movie_review.tier.exception.TierIdNotFound;
+import hyundai.movie_review.tier.exception.TierIdNotFoundException;
 import hyundai.movie_review.tier.repository.TierRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +70,7 @@ public class CustomUserDetailService extends DefaultOAuth2UserService {
         // 처음 회원가입 일 떄의 로직
         if (member.getTier() == null || member.getBadge() == null) {
             Tier initTier = tierRepository.findById(1L)
-                    .orElseThrow(TierIdNotFound::new);
+                    .orElseThrow(TierIdNotFoundException::new);
             Badge initBadge = badgeRepository.findById(1L)
                     .orElseThrow(BadgeIdNotFoundException::new);
             MemberBadge memberBadge = MemberBadge.builder()
