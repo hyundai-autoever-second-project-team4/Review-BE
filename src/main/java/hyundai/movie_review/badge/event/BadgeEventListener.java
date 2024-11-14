@@ -2,6 +2,7 @@ package hyundai.movie_review.badge.event;
 
 import hyundai.movie_review.badge.constant.BadgeConditionByBadgeCount;
 import hyundai.movie_review.badge.constant.BadgeConditionByGenreCount;
+import hyundai.movie_review.badge.constant.BadgeConditionBySpecificReview;
 import hyundai.movie_review.badge.constant.BadgeConditionByTotalReviewCount;
 import hyundai.movie_review.badge.entity.Badge;
 import hyundai.movie_review.badge.exception.BadgeIdNotFoundException;
@@ -40,7 +41,36 @@ public class BadgeEventListener {
         handleBadgeAwardByReviewCount(member);  // 총 리뷰 카운트에 대한 뱃지 어워드
         handleBadgeAwardByBadgeCount(member);   // 총 뱃지 카운트에 대한 뱃지 어워드
         handleBadgeAwardByGenreCount(member);   // 작성한 리뷰 기반 장르 카운트에 대한 뱃지 어워드
+        handleBadgeAwardBySpecificReview(member);   // 특정 리뷰에 대한 이벤트 뱃지 어워드
 
+    }
+
+    private void handleBadgeAwardBySpecificReview(Member member) {
+        member.getReviews().stream()
+                .filter(review -> !review.getDeleted()) // 삭제되지 않은 리뷰만 확인
+                .forEach(review -> {
+                    // 좋아요 수가 조건을 만족하는 경우 배지 부여
+                    long thearUpCount = review.getThearUps();
+
+                    BadgeConditionBySpecificReview.getBadgeConditionForUpCount(thearUpCount)
+                            .ifPresent(condition -> {
+                                log.info("[SUCCESS] 특정 리뷰의 좋아요 수 조건 충족: {}",
+                                        condition.getDescription());
+                                awardBadgeIfNotReceived(member, condition.getBadgeId());
+                            });
+
+                    // 댓글 수가 조건을 만족하는 경우 배지 부여
+                    int commentCount = Optional.ofNullable(review.getComments())
+                            .map(List::size)
+                            .orElse(0);
+
+                    BadgeConditionBySpecificReview.getBadgeConditionForCommentCount(commentCount)
+                            .ifPresent(condition -> {
+                                log.info("[SUCCESS] 특정 리뷰의 댓글 수 조건 충족: {}",
+                                        condition.getDescription());
+                                awardBadgeIfNotReceived(member, condition.getBadgeId());
+                            });
+                });
     }
 
     private void handleBadgeAwardByGenreCount(Member member) {
@@ -57,7 +87,8 @@ public class BadgeEventListener {
                     genreName, count);
 
             conditions.forEach(condition -> {
-                log.info("[SUCCESS] 장르별 배지 기준 충족: {}, 장르 : {}, 카운트 : {}", condition.getDescription(), condition.getGenre(), condition.getThreshold());
+                log.info("[SUCCESS] 장르별 배지 기준 충족: {}, 장르 : {}, 카운트 : {}",
+                        condition.getDescription(), condition.getGenre(), condition.getThreshold());
                 awardBadgeIfNotReceived(member, condition.getBadgeId());
             });
         });

@@ -1,5 +1,7 @@
 package hyundai.movie_review.badge.constant;
 
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.Getter;
 
 // 특정 리뷰의 좋아요 또는 댓글 수에 따라 달성되는 배지 조건을 정의
@@ -17,5 +19,21 @@ public enum BadgeConditionBySpecificReview {
         this.badgeId = badgeId;
         this.description = description;
         this.threshold = threshold;
+    }
+
+    public static Optional<BadgeConditionBySpecificReview> getBadgeConditionForUpCount(
+            long upCount) {
+        return Arrays.stream(values())
+                .filter(condition -> condition == SINGLE_REVIEW_UP_30
+                        && upCount == condition.getThreshold())
+                .findFirst();
+    }
+
+    public static Optional<BadgeConditionBySpecificReview> getBadgeConditionForCommentCount(
+            long commentCount) {
+        return Arrays.stream(values())
+                .filter(condition -> condition == SINGLE_REVIEW_COMMENT_10
+                        && commentCount == condition.getThreshold())
+                .findFirst();
     }
 }
