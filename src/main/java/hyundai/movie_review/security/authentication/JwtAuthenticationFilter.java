@@ -115,7 +115,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String extractTokenFromHeaders(HttpServletRequest request, String headerName) {
         String headerValue = request.getHeader(headerName);
         if (headerValue != null && headerValue.startsWith("Bearer ")) {
-            return headerValue.substring(7); // "Bearer " 제거
+
+            String value = headerValue.substring(7);
+            if (value.startsWith("null")) {
+                return null;
+            }
+            return value; // "Bearer " 제거
         }
         return null;
     }
@@ -126,7 +131,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        BusinessExceptionResponse exceptionResponse = new BusinessExceptionResponse(status, message, exception);
+        BusinessExceptionResponse exceptionResponse = new BusinessExceptionResponse(status, message,
+                exception);
 
         response.setStatus(status.value());
         response.setContentType("application/json");
