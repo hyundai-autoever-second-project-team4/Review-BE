@@ -84,7 +84,7 @@ public class ReviewController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "HOT 리뷰 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ReviewDeleteResponse.class))),
+                            schema = @Schema(implementation = ReviewInfoListDto.class))),
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content())
     })
     @GetMapping("/review/hot")
