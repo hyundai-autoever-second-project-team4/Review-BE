@@ -1,5 +1,6 @@
 package hyundai.movie_review.badge.dto;
 
+import hyundai.movie_review.member.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -14,4 +15,16 @@ public record BadgeMyPageInfoDto(
         @Schema(description = "배지 목록")
         List<BadgeInfoDto> badges
 ) {
+        public static BadgeMyPageInfoDto of(Member member){
+                List<BadgeInfoDto> badges = member.getMemberBadges().stream()
+                        .map(memberBadge -> {
+                                return BadgeInfoDto.of(memberBadge.getBadgeId());
+                        }).toList();
+
+                return new BadgeMyPageInfoDto(
+                        member.getBadge().getId(),
+                        member.getBadge().getBackground_img(),
+                        badges
+                );
+        }
 }
