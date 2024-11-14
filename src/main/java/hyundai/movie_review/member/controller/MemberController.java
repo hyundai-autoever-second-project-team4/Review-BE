@@ -1,6 +1,7 @@
 package hyundai.movie_review.member.controller;
 
 import hyundai.movie_review.exception.BusinessExceptionResponse;
+import hyundai.movie_review.member.dto.GetMemberMyPageResponse;
 import hyundai.movie_review.member.dto.MemberInfoResponse;
 import hyundai.movie_review.member.service.MemberService;
 import hyundai.movie_review.movie.dto.MovieDetailResponse;
@@ -35,6 +36,14 @@ public class MemberController {
     @GetMapping("/member")
     public ResponseEntity<?> getMemberInfo() {
         MemberInfoResponse response = memberService.getMemberInfo();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "사용자 마이페이지 정보 조회", description = "현재 로그인한 사용자의 마이페이지 정보를 조회합니다.")
+    @GetMapping("/member/mypage")
+    public ResponseEntity<?> getMemberMyPageInfo(){
+        GetMemberMyPageResponse response = memberService.getMemberMyPageInfo();
 
         return ResponseEntity.ok(response);
     }
