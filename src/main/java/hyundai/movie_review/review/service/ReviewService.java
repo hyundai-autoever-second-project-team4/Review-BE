@@ -159,7 +159,7 @@ public class ReviewService {
 
     /* 영화 id에 해당하는 리뷰가 존재하는 지 검증 */
     private void validateReviewExists(Long memberId, Long movieId) {
-        if (reviewRepository.existsByMemberIdAndMovieId(memberId, movieId)) {
+        if (reviewRepository.existsByMemberIdAndMovieIdAndDeletedFalse(memberId, movieId)) {
             throw new ReviewAlreadyExistsException();
         }
     }
