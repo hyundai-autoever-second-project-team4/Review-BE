@@ -41,6 +41,9 @@ public class MemberController {
     }
 
     @Operation(summary = "사용자 마이페이지 정보 조회", description = "현재 로그인한 사용자의 마이페이지 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "마이페이지 정보 조회 성공",
+            content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = GetMemberMyPageResponse.class)))
     @GetMapping("/member/mypage")
     public ResponseEntity<?> getMemberMyPageInfo(){
         GetMemberMyPageResponse response = memberService.getMemberMyPageInfo();
