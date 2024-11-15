@@ -60,12 +60,14 @@ public class MovieService {
                 boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member, review);
                 boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(member,
                         review);
+                boolean isWriter = member.equals(review.getMember());
 
                 //로그인 한 경우
                 return ReviewInfoDto.of(
                         review,
                         isThearUp,
-                        isThearDown
+                        isThearDown,
+                        isWriter
                 );
             }).toList();
         } else {
@@ -73,6 +75,7 @@ public class MovieService {
                 //로그인 안한 경우
                 return ReviewInfoDto.of(
                         review,
+                        false,
                         false,
                         false
                 );
@@ -168,10 +171,12 @@ public class MovieService {
                         boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(
                                 member,
                                 review);
+                        boolean isWriter = member.equals(review.getMember());
                         return ReviewInfoDto.of(
                                 review,
                                 isThearUp,
-                                isThearDown
+                                isThearDown,
+                                isWriter
                         );
                     }).toList();
         }
@@ -180,6 +185,7 @@ public class MovieService {
                     .map(review -> {
                         return ReviewInfoDto.of(
                                 review,
+                                false,
                                 false,
                                 false
                         );
