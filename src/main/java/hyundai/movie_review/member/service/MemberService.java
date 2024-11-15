@@ -111,10 +111,12 @@ public class MemberService {
                     review);
             boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(currentMember,
                     review);
+            boolean isWriter = currentMember.equals(review.getMember());
             return ReviewInfoDto.of(
                     review,
                     isThearUp,
-                    isThearDown
+                    isThearDown,
+                    isWriter
             );
         }).toList();
 

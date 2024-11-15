@@ -50,13 +50,17 @@ public record ReviewInfoDto(
         Boolean isThearUp,
 
         @Schema(description = "내가 리뷰에 띠어다운/싫어요 체크 여부")
-        Boolean isThearDown
+        Boolean isThearDown,
+
+        @Schema(description = "로그인한 사용자가 리뷰 작성자인지 체크")
+        boolean isWriter
 ) {
 
     public static ReviewInfoDto of(
             Review review,
             Boolean isThearUp,
-            Boolean isThearDown
+            Boolean isThearDown,
+            Boolean isWriter
     ) {
         return new ReviewInfoDto(
                 review.getMember().getId(),
@@ -74,7 +78,8 @@ public record ReviewInfoDto(
                 review.getThearDowns(),
                 review.getCommentCounts(),
                 isThearUp,
-                isThearDown
+                isThearDown,
+                isWriter
         );
     }
 }

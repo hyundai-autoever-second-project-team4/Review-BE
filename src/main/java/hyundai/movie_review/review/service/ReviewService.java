@@ -64,10 +64,12 @@ public class ReviewService {
                         boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(
                                 member,
                                 review);
+                        boolean isWriter = member.equals(review.getMember());
                         return ReviewInfoDto.of(
                                 review,
                                 isThearUp,
-                                isThearDown
+                                isThearDown,
+                                isWriter
                         );
                     }).toList();
         } else {
@@ -76,6 +78,7 @@ public class ReviewService {
                         //로그인 안한 경우
                         return ReviewInfoDto.of(
                                 review,
+                                false,
                                 false,
                                 false
                         );
@@ -186,14 +189,16 @@ public class ReviewService {
         boolean isLogin = memberResolver.isAuthenticated();
         boolean isThearUp = false;
         boolean isThearDown = false;
+        boolean isWriter = false;
         if (isLogin) {
             // 3) 리뷰에 up, down 여부 체크
             Member currentMember = memberResolver.getCurrentMember();
             isThearUp = thearUpRepository.existsByMemberIdAndReviewId(currentMember, review);
             isThearDown = thearDownRepository.existsByMemberIdAndReviewId(currentMember, review);
+            isWriter = currentMember.equals(review.getMember());
         }
 
-        ReviewInfoDto reviewInfo = ReviewInfoDto.of(review, isThearUp, isThearDown);
+        ReviewInfoDto reviewInfo = ReviewInfoDto.of(review, isThearUp, isThearDown, isWriter);
 
         // 4) 리뷰의 댓글 정보 가져오기
         List<Comment> comments = review.getComments();
