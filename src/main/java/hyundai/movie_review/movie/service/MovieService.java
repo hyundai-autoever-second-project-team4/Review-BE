@@ -151,9 +151,7 @@ public class MovieService {
         //별점낮은순
         else if(type.equals("ratingLow")){ reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByStarRate(movieId, pageable); }
         //댓글많은순(선택)
-//        else if(type.equals("comments")){
-//
-//        }
+        else if(type.equals("comments")){ reviews = reviewRepository.findByMovieIdOrderByComments(movieId, pageable); }
         else{ throw new MovieReviewTypeNotFound(); }
 
         // 2) 현재 로그인 한 멤버인지 확인

@@ -34,4 +34,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
     // 영화 리뷰 별점 낮은 순
     List<Review> findByMovieIdAndDeletedFalseOrderByStarRate(Long movieId, Pageable pageable);
 
+    // 영화 리뷰 댓글 많은 순
+    @Query("SELECT r FROM Review r LEFT JOIN r.comments c WHERE r.movie.id = :movieId AND r.deleted = false "
+            +"GROUP BY r.id ORDER BY COUNT(c) DESC")
+    List<Review> findByMovieIdOrderByComments(@Param("movieId") Long movieId, Pageable pageable);
+
 }
