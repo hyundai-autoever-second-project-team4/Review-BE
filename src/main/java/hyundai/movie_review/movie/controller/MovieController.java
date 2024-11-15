@@ -100,11 +100,11 @@ public class MovieController {
 
     @Operation(summary = "영화 전체 리뷰 상세 조회",
             description = "영화 id에 해당하는 리뷰 상세 내용을 조회해 페이지네이션으로 전달, "
-                    +"type에 latest(최신순), likes(좋아요순), ratingHigh(별점높은순), ratingLow(별점낮은순), comments(댓글많은순)를 받는다.")
+                    +"type에 likes(좋아요순), latest(최신순), ratingHigh(별점높은순), ratingLow(별점낮은순), comments(댓글많은순)를 받는다.")
     @GetMapping("/movie/{movieId}/reviews")
     public ResponseEntity<?> getMovieReview(
             @PathVariable("movieId") Long movieId,
-            @RequestParam(defaultValue = "latest", name = "type") String type,
+            @Parameter(example = "likes, latest, ratingHigh, ratingLow, comments 중 택1") @RequestParam(defaultValue = "likes", name = "type") String type,
             @RequestParam(defaultValue = "0", name = "page") Integer page
     ){
         ReviewInfoPageDto response = movieService.getMovieReviewDetail(movieId, type, page);
