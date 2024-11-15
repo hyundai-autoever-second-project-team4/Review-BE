@@ -16,8 +16,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -55,10 +57,31 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "사용자 정보 수정", description = "수정할 사용자 정보를 업데이트, 프로필 사진 변경 없는 경우 null")
+    @Operation(
+            summary = "사용자 정보 수정",
+            description = """
+                요청 예시:
+                <ul>
+                <li><b>HTTP 메서드:</b> PUT</li>
+                <li><b>URL:</b> /member/update</li>
+                <li><b>헤더:</b> Content-Type: multipart/form-data</li>
+                <li><b>본문:</b></li>
+                <ul>
+                    <li>memberName: 영화 팬</li>
+                    <li>memberProfileImg: 선택한 이미지 파일</li>
+                    <li>primaryBadgeId: 2</li>
+                </ul>
+                </ul>
+                """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "업데이트 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PutMapping("/member/update")
     public ResponseEntity<?> updateMemberProfileInfo(
-            @RequestBody MemberProfileUpdateRequest request
+            @ModelAttribute MemberProfileUpdateRequest request
     ){
         MemberProfileUpdateResponse response = memberService.updateMemberInfo(request);
 
