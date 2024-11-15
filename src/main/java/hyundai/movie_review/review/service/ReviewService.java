@@ -1,14 +1,13 @@
 package hyundai.movie_review.review.service;
 
+import hyundai.movie_review.comment.dto.CommentGetAllResponse;
+import hyundai.movie_review.comment.dto.CommentGetResponse;
+import hyundai.movie_review.comment.entity.Comment;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.movie.exception.MovieIdNotFoundException;
 import hyundai.movie_review.movie.repository.MovieRepository;
-import hyundai.movie_review.review.dto.ReviewCreateRequest;
-import hyundai.movie_review.review.dto.ReviewCreateResponse;
-import hyundai.movie_review.review.dto.ReviewDeleteResponse;
-import hyundai.movie_review.review.dto.ReviewInfoDto;
-import hyundai.movie_review.review.dto.ReviewInfoListDto;
+import hyundai.movie_review.review.dto.*;
 import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.review.event.ReviewScoreEvent;
 import hyundai.movie_review.review.exception.ReviewAlreadyExistsException;
@@ -155,6 +154,34 @@ public class ReviewService {
         applicationEventPublisher.publishEvent(new ReviewScoreEvent(this, currentMember, false));
 
         return ReviewDeleteResponse.of(review);
+    }
+
+    public ReviewDetailInfoDto getReviewDetail(Long reviewId){
+        // 1) 리뷰 id로 리뷰 정보 가져오기
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(ReviewIdNotFoundException::new);
+
+        // 2) 로그인한 사용자인지 확인
+        boolean isLogin = memberResolver.isAuthenticated();
+        boolean isThearUp = false;
+        boolean isThearDown = false;
+        if(isLogin){
+            // 3) 리뷰에 up, down 여부 체크
+            Member currentMember = memberResolver.getCurrentMember();
+            isThearUp = thearUpRepository.existsByMemberIdAndReviewId(currentMember, review);
+            isThearDown = thearDownRepository.existsByMemberIdAndReviewId(currentMember, review);
+        }
+
+        ReviewInfoDto reviewInfo = ReviewInfoDto.of(review, isThearUp, isThearDown);
+
+        // 4) 리뷰의 댓글 정보 가져오기
+        List<Comment> comments = review.getComments();
+        List<CommentGetResponse> commentDtos = comments.stream()
+                .map(comment -> CommentGetResponse.of(comment.getMemberId(), reviewId, comment))
+                .toList();
+        CommentGetAllResponse commentInfo = new CommentGetAllResponse((long)commentDtos.size(), commentDtos);
+
+        return ReviewDetailInfoDto.of(reviewInfo, commentInfo);
     }
 
     /* 영화 id에 해당하는 리뷰가 존재하는 지 검증 */

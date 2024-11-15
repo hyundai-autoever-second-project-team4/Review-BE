@@ -1,10 +1,7 @@
 package hyundai.movie_review.review.controller;
 
 import hyundai.movie_review.exception.BusinessExceptionResponse;
-import hyundai.movie_review.review.dto.ReviewCreateRequest;
-import hyundai.movie_review.review.dto.ReviewCreateResponse;
-import hyundai.movie_review.review.dto.ReviewDeleteResponse;
-import hyundai.movie_review.review.dto.ReviewInfoListDto;
+import hyundai.movie_review.review.dto.*;
 import hyundai.movie_review.review.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -90,6 +87,19 @@ public class ReviewController {
     @GetMapping("/review/hot")
     public ResponseEntity<?> getHotReviews() {
         ReviewInfoListDto response = reviewService.getHotReviews();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "리뷰 상세 모달 조회", description = "리뷰 id에 해당하는 리뷰 상세 정보와 댓글 조회")
+    @ApiResponse(responseCode = "200", description = "리뷰 상세 모달 정보 조회",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ReviewDetailInfoDto.class)))
+    @GetMapping("/review/{reviewId}")
+    public ResponseEntity<?> getReviewDetails(
+            @PathVariable("reviewId") Long reviewId
+    ){
+        ReviewDetailInfoDto response = reviewService.getReviewDetail(reviewId);
 
         return ResponseEntity.ok(response);
     }

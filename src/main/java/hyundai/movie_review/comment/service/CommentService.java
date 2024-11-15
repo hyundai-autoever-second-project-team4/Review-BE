@@ -133,16 +133,7 @@ public class CommentService {
                                     member.getId());
                             log.info("{}",
                                     memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
-                            return new CommentGetResponse(
-                                    comment.getId(),
-                                    comment.getReviewId().getId(),
-                                    member.getName(),
-                                    member.getProfileImage(),
-                                    dto.tierImage(),
-                                    dto.badgeImage(),
-                                    comment.getContent(),
-                                    comment.getCreatedAt()
-                            );
+                            return CommentGetResponse.of(member, reviewId, comment);
                         }
                 ).toList();
 
@@ -163,15 +154,6 @@ public class CommentService {
         log.info("{}", memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
         MemberBadgeAndTierDto dto = memberRepository.getTierAndBadgeImgByMemberId(member.getId());
 
-        return new CommentGetResponse(
-                comment.getId(),
-                comment.getReviewId().getId(),
-                member.getName(),
-                member.getProfileImage(),
-                dto.tierImage(),
-                dto.badgeImage(),
-                comment.getContent(),
-                comment.getCreatedAt()
-        );
+        return CommentGetResponse.of(member, comment.getReviewId().getId(), comment);
     }
 }
