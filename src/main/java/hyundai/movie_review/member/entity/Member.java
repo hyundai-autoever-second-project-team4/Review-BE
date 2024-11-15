@@ -61,6 +61,10 @@ public class Member {
         this.memberRoles.add(role);
     }
 
+    public void setName(String name){ this.name = name; }
+
+    public void setProfileImage(String profileImage){ this.profileImage = profileImage; }
+
     public void setTier(Tier tier) {
         this.tier = tier;
     }
