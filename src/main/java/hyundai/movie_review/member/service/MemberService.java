@@ -1,9 +1,14 @@
 package hyundai.movie_review.member.service;
 
+import hyundai.movie_review.badge.entity.Badge;
+import hyundai.movie_review.badge.exception.BadgeIdNotFoundException;
+import hyundai.movie_review.badge.repository.BadgeRepository;
 import hyundai.movie_review.genre.dto.GenreCountListDto;
 import hyundai.movie_review.genre.repository.GenreRepository;
 import hyundai.movie_review.member.dto.GetMemberMyPageResponse;
 import hyundai.movie_review.member.dto.MemberInfoResponse;
+import hyundai.movie_review.member.dto.MemberProfileUpdateRequest;
+import hyundai.movie_review.member.dto.MemberProfileUpdateResponse;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.review.dto.ReviewCountArrayDto;
 import hyundai.movie_review.review.dto.ReviewInfoDto;
@@ -18,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,10 +38,13 @@ import java.util.stream.IntStream;
 public class MemberService {
 
     private final MemberResolver memberResolver;
+    private final BadgeRepository badgeRepository;
     private final GenreRepository genreRepository;
     private final ReviewRepository reviewRepository;
     private final ThearUpRepository thearUpRepository;
     private final ThearDownRepository thearDownRepository;
+
+
 
     public MemberInfoResponse getMemberInfo() {
         // 1) 현재 로그인 한 유저 정보 가져오기
@@ -101,5 +110,22 @@ public class MemberService {
         }).toList();
 
         return GetMemberMyPageResponse.of(currentMember, genreCountList, starRateList, ReviewInfoListDto.of(reviewDtoList));
+    }
+
+    public MemberProfileUpdateResponse updateMemberInfo(MemberProfileUpdateRequest request){
+        Member currentMember = memberResolver.getCurrentMember();
+        Badge primaryBadge = badgeRepository.findById(request.primaryBadgeId())
+                .orElseThrow(BadgeIdNotFoundException::new);
+
+        // S3에 프로필 이미지 저장해서 수정
+        if(request.memberProfileImg() != null){
+
+        }
+
+        // 프로필 변경 사항 저장
+        currentMember.setName(request.memberName());
+        currentMember.setBadge(primaryBadge);
+
+        return MemberProfileUpdateResponse.of(currentMember.getId());
     }
 }

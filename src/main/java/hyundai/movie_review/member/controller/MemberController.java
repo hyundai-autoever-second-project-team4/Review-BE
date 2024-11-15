@@ -3,6 +3,8 @@ package hyundai.movie_review.member.controller;
 import hyundai.movie_review.exception.BusinessExceptionResponse;
 import hyundai.movie_review.member.dto.GetMemberMyPageResponse;
 import hyundai.movie_review.member.dto.MemberInfoResponse;
+import hyundai.movie_review.member.dto.MemberProfileUpdateRequest;
+import hyundai.movie_review.member.dto.MemberProfileUpdateResponse;
 import hyundai.movie_review.member.service.MemberService;
 import hyundai.movie_review.movie.dto.MovieDetailResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +16,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -47,6 +51,16 @@ public class MemberController {
     @GetMapping("/member/mypage")
     public ResponseEntity<?> getMemberMyPageInfo(){
         GetMemberMyPageResponse response = memberService.getMemberMyPageInfo();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "사용자 정보 수정", description = "수정할 사용자 정보를 업데이트, 프로필 사진 변경 없는 경우 null")
+    @PutMapping("/member/update")
+    public ResponseEntity<?> updateMemberProfileInfo(
+            @RequestBody MemberProfileUpdateRequest request
+    ){
+        MemberProfileUpdateResponse response = memberService.updateMemberInfo(request);
 
         return ResponseEntity.ok(response);
     }
