@@ -7,16 +7,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "영화에 대한 태그 DTO")
 public record TagInfoDto(
 
+        @Schema(description = "태그 id", example = "1")
+        long tagId,
         @Schema(description = "태그 내용", example = "연인과 함께")
-        String content,
-        @Schema(description = "태그 이미지", example = "./heart.jpg")
-        String img
+        String content
 ) {
 
     public static TagInfoDto of(MovieTag movieTag) {
         return new TagInfoDto(
-                movieTag.getTag().getContent(),
-                movieTag.getTag().getImg()
+                movieTag.getTag().getId(),
+                movieTag.getTag().getContent()
         );
     }
 
