@@ -1,5 +1,6 @@
 package hyundai.movie_review.review.repository;
 
+import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.review.entity.Review;
 
@@ -15,7 +16,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
 
     Optional<Review> findByIdAndDeletedFalse(Long reviewId);
 
-    boolean existsByMemberIdAndMovieId(Long memberId, Long movieId);
+    boolean existsByMemberIdAndMovieIdAndDeletedFalse(Long memberId, Long movieId);
 
     // 영화 리뷰 개수
     long countByMovieId(Long movieId);
@@ -25,7 +26,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
 
     // 영화 리뷰 up순
     @Query("SELECT r FROM Review r LEFT JOIN r.thearUps t WHERE r.movie.id = :movieId AND r.deleted = false "
-    +"GROUP BY r.id ORDER BY COUNT(t) DESC")
+            + "GROUP BY r.id ORDER BY COUNT(t) DESC")
     List<Review> findByMovieIdOrderByUps(@Param("movieId") Long movieId, Pageable pageable);
 
     // 영화 리뷰 별점 많은 순
@@ -39,4 +40,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
             +"GROUP BY r.id ORDER BY COUNT(c) DESC")
     List<Review> findByMovieIdOrderByComments(@Param("movieId") Long movieId, Pageable pageable);
 
+    List<Review> findByMemberIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
 }

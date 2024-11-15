@@ -6,10 +6,15 @@ import hyundai.movie_review.member.dto.GetMemberMyPageResponse;
 import hyundai.movie_review.member.dto.MemberInfoResponse;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.review.dto.ReviewCountArrayDto;
+import hyundai.movie_review.review.dto.ReviewInfoDto;
+import hyundai.movie_review.review.dto.ReviewInfoListDto;
 import hyundai.movie_review.review.entity.Review;
+import hyundai.movie_review.review.repository.ReviewRepository;
 import hyundai.movie_review.security.MemberResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -26,6 +31,7 @@ public class MemberService {
 
     private final MemberResolver memberResolver;
     private final GenreRepository genreRepository;
+    private final ReviewRepository reviewRepository;
 
     public MemberInfoResponse getMemberInfo() {
         // 1) 현재 로그인 한 유저 정보 가져오기
@@ -78,6 +84,17 @@ public class MemberService {
                 starRate, averageRate, totalRateCount, mostRated
         );
 
-        return GetMemberMyPageResponse.of(currentMember, genreCountList, starRateList);
+        // 4) 유저가 작성한 리뷰 최신순으로 5개 가져오기
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Review> reviewList= reviewRepository.findByMemberIdOrderByCreatedAtDesc(currentMember.getId(), pageable);
+        List<ReviewInfoDto> reviewDtoList =reviewList.stream().map(review -> {
+            return ReviewInfoDto.of(
+                    review,
+                    false,
+                    false
+            );
+        }).toList();
+
+        return GetMemberMyPageResponse.of(currentMember, genreCountList, starRateList, ReviewInfoListDto.of(reviewDtoList));
     }
 }
