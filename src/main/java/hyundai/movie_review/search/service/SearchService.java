@@ -32,4 +32,18 @@ public class SearchService {
         return new PageImpl<>(movieDtos, pageable, moviesPage.getTotalElements());
     }
 
+    public Page<MovieWithGenreInfoDto> searchMovieByGenre(String genre, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Page<Movie>를 가져온 후 DTO로 변환
+        Page<Movie> moviesPage = movieRepository.findMoviesByGenreName(genre, pageable);
+
+        // Movie -> MovieWithGenreInfoDto로 변환
+        List<MovieWithGenreInfoDto> movieDtos = moviesPage.getContent().stream()
+                .map(MovieWithGenreInfoDto::of)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(movieDtos, pageable, moviesPage.getTotalElements());
+    }
+
 }

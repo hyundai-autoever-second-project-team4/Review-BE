@@ -31,11 +31,14 @@ public class SearchController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/search/actor")
+    @GetMapping("/search/genre")
     public ResponseEntity<?> searchMovieByActor(
-            @RequestParam String actor
+            @RequestParam String genre,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
     ) {
-        return ResponseEntity.ok(null);
+        Page<MovieWithGenreInfoDto> response = searchService.searchMovieByGenre(genre, page, size);
 
+        return ResponseEntity.ok(response);
     }
 }

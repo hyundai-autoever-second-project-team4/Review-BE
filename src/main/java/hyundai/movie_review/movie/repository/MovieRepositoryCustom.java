@@ -3,6 +3,8 @@ package hyundai.movie_review.movie.repository;
 import hyundai.movie_review.movie.dto.MovieWithRatingInfoDto;
 import hyundai.movie_review.movie.entity.Movie;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface MovieRepositoryCustom {
 
@@ -13,5 +15,6 @@ public interface MovieRepositoryCustom {
     List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long genreId);
 
     List<MovieWithRatingInfoDto> findHonorBoardMovies();
+    Page<Movie> findMoviesByGenreName(String genreName, Pageable pageable);
 
 }

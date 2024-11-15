@@ -1,17 +1,21 @@
 package hyundai.movie_review.movie.repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hyundai.movie_review.genre.entity.QGenre;
 import hyundai.movie_review.movie.dto.MovieWithRatingInfoDto;
+import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.movie.entity.QMovie;
 import hyundai.movie_review.movie_genre.entity.QMovieGenre;
 import hyundai.movie_review.review.entity.QReview;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -144,6 +148,27 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
                 )
                 .limit(10)
                 .fetch();
+    }
+
+    @Override
+    public Page<Movie> findMoviesByGenreName(String genreName, Pageable pageable) {
+        QMovie movie = QMovie.movie;
+        QMovieGenre movieGenre = QMovieGenre.movieGenre;
+        QGenre genre = QGenre.genre;
+
+        List<Movie> movies = queryFactory
+                .select(movie)
+                .from(movie)
+                .join(movie.genres, movieGenre)
+                .join(movieGenre.genre, genre)
+                .where(genre.name.like("%" + genreName.toLowerCase() + "%"))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = movies.size();
+
+        return new PageImpl<>(movies, pageable, total);
     }
 
 }
