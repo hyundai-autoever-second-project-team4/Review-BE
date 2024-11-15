@@ -6,6 +6,7 @@ import hyundai.movie_review.movie.dto.MovieWithRatingListResponse;
 import hyundai.movie_review.movie.dto.MovieWithRatingInfoDto;
 import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.movie.exception.MovieIdNotFoundException;
+import hyundai.movie_review.movie.exception.MovieReviewTypeNotFound;
 import hyundai.movie_review.movie.repository.MovieRepository;
 import hyundai.movie_review.movie.vo.MovieGenreCountMap;
 import hyundai.movie_review.review.dto.ReviewCountListDto;
@@ -19,6 +20,8 @@ import hyundai.movie_review.thear_down.repository.ThearDownRepository;
 import hyundai.movie_review.thear_up.repository.ThearUpRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,7 +47,7 @@ public class MovieService {
 
         // 3) 영화 id에 해당하는 리뷰 리스트 조회
         Pageable pageable = PageRequest.of(0, 5);
-        List<Review> reviews = reviewRepository.findByMovieId(movieId, pageable);
+        List<Review> reviews = reviewRepository.findByMovieIdOrderByUps(movieId, pageable);
 
         // 4) 로그인한 상태인지 체크 후 thearup, theardown 여부
         boolean isLogin = memberResolver.isAuthenticated();
@@ -134,4 +137,56 @@ public class MovieService {
         return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
     }
 
+    public ReviewInfoPageDto getMovieReviewDetail(Long movieId, String type, Integer page){
+        Pageable pageable = PageRequest.of(page, 10);
+
+        // 1) 정렬 타입에 따라 리뷰 가져오기
+        List<Review> reviews;
+        //최신순
+        if(type.equals("latest")){ reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByCreatedAtDesc(movieId, pageable); }
+        //up 순
+        else if(type.equals("likes")){ reviews = reviewRepository.findByMovieIdOrderByUps(movieId, pageable); }
+        //별점높은순
+        else if(type.equals("ratingHigh")){ reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByStarRateDesc(movieId, pageable); }
+        //별점낮은순
+        else if(type.equals("ratingLow")){ reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByStarRate(movieId, pageable); }
+        //댓글많은순(선택)
+        else if(type.equals("comments")){ reviews = reviewRepository.findByMovieIdOrderByComments(movieId, pageable); }
+        else{ throw new MovieReviewTypeNotFound(); }
+
+        // 2) 현재 로그인 한 멤버인지 확인
+        boolean isLoggedIn = memberResolver.isAuthenticated();
+        List<ReviewInfoDto> reviewInfoList;
+        if(isLoggedIn){
+            Member member = memberResolver.getCurrentMember();
+            reviewInfoList = reviews.stream()
+                    .map(review -> {
+                        boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member,
+                                review);
+                        boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(
+                                member,
+                                review);
+                        return ReviewInfoDto.of(
+                                review,
+                                isThearUp,
+                                isThearDown
+                        );
+                    }).toList();
+        }
+        else{
+            reviewInfoList = reviews.stream()
+                    .map(review -> {
+                        return ReviewInfoDto.of(
+                                review,
+                                false,
+                                false
+                        );
+                    }).toList();
+        }
+
+        // 3) 페이지네이션으로 return
+        long total = reviewRepository.countByMovieId(movieId);
+        Page<ReviewInfoDto> reviewInfoPage = new PageImpl<>(reviewInfoList, pageable, total);
+        return ReviewInfoPageDto.of(reviewInfoPage);
+    }
 }
