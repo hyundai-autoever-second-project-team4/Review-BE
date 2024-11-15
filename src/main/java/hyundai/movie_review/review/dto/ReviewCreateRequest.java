@@ -1,6 +1,7 @@
 package hyundai.movie_review.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 
 @Schema(description = "리뷰 생성 요청 데이터")
 public record ReviewCreateRequest(
@@ -15,7 +16,10 @@ public record ReviewCreateRequest(
         String content,
 
         @Schema(description = "스포일러 포함 여부", example = "false")
-        Boolean spoiler
+        Boolean spoiler,
 
+        @Schema(description = "리뷰에 작성한 태그들의 id", example = "[ 1, 2, 3 ]")
+
+        List<Long> tagIds
 ) {
 }
