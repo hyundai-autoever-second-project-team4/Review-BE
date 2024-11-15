@@ -11,6 +11,8 @@ import hyundai.movie_review.review.dto.ReviewInfoListDto;
 import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.review.repository.ReviewRepository;
 import hyundai.movie_review.security.MemberResolver;
+import hyundai.movie_review.thear_down.repository.ThearDownRepository;
+import hyundai.movie_review.thear_up.repository.ThearUpRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +34,8 @@ public class MemberService {
     private final MemberResolver memberResolver;
     private final GenreRepository genreRepository;
     private final ReviewRepository reviewRepository;
+    private final ThearUpRepository thearUpRepository;
+    private final ThearDownRepository thearDownRepository;
 
     public MemberInfoResponse getMemberInfo() {
         // 1) 현재 로그인 한 유저 정보 가져오기
@@ -87,10 +91,12 @@ public class MemberService {
         Pageable pageable = PageRequest.of(0, 5);
         List<Review> reviewList= reviewRepository.findByMemberIdOrderByCreatedAtDesc(currentMember.getId(), pageable);
         List<ReviewInfoDto> reviewDtoList =reviewList.stream().map(review -> {
+            boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(currentMember, review);
+            boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(currentMember, review);
             return ReviewInfoDto.of(
                     review,
-                    false,
-                    false
+                    isThearUp,
+                    isThearDown
             );
         }).toList();
 
