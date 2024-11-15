@@ -15,6 +15,8 @@ import java.util.List;
 
 @Schema(description = "영화 디테일 정보 DTO")
 public record MovieDetailResponse(
+        @Schema(description = "영화 리뷰 작성 여부", example = "true")
+        boolean isReviewed,
 
         @Schema(description = "영화의 ID", example = "100")
         long movieId,
@@ -42,8 +44,9 @@ public record MovieDetailResponse(
         ReviewInfoListDto reviewInfoList
 ) {
 
-    public static MovieDetailResponse of(Movie movie, ReviewCountListDto reviewCountListDto, ReviewInfoListDto reviewByMovieIdListDto) {
+    public static MovieDetailResponse of(boolean isReviewed, Movie movie, ReviewCountListDto reviewCountListDto, ReviewInfoListDto reviewByMovieIdListDto) {
         return new MovieDetailResponse(
+                isReviewed,
                 movie.getId(),
                 MovieInfoDto.of(movie),
                 ActorInfoListDto.of(movie.getActors()),

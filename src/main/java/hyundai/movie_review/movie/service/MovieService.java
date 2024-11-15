@@ -52,8 +52,10 @@ public class MovieService {
         // 4) 로그인한 상태인지 체크 후 thearup, theardown 여부
         boolean isLogin = memberResolver.isAuthenticated();
         List<ReviewInfoDto> reviewInfoList;
+        boolean isReviewed = false;
         if (isLogin) {
             Member member = memberResolver.getCurrentMember();
+            isReviewed = reviewRepository.existsByMemberIdAndMovieIdAndDeletedFalse(member.getId(), movieId);
             reviewInfoList = reviews.stream().map(review -> {
                 boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member, review);
                 boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(member,
@@ -79,7 +81,7 @@ public class MovieService {
 
         ReviewInfoListDto reviewInfoListDto = ReviewInfoListDto.of(reviewInfoList);
 
-        return MovieDetailResponse.of(movie, reviewCountListDto, reviewInfoListDto);
+        return MovieDetailResponse.of(isReviewed, movie, reviewCountListDto, reviewInfoListDto);
     }
 
     public MovieWithRatingListResponse getMoviesByHighestRatingThisWeek() {
