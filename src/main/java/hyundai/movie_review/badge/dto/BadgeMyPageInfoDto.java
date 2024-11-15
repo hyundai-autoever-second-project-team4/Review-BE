@@ -16,10 +16,16 @@ public record BadgeMyPageInfoDto(
         List<BadgeInfoDto> badges
 ) {
         public static BadgeMyPageInfoDto of(Member member){
-                List<BadgeInfoDto> badges = member.getMemberBadges().stream()
+                List<BadgeInfoDto> badges = new java.util.ArrayList<>(member.getMemberBadges().stream()
                         .map(memberBadge -> {
-                                return BadgeInfoDto.of(memberBadge.getBadgeId());
-                        }).toList();
+                            return BadgeInfoDto.of(memberBadge.getBadgeId());
+                        }).toList());
+
+                BadgeInfoDto primaryBadge = BadgeInfoDto.of(member.getBadge());
+                if(badges.contains(primaryBadge)) {
+                        badges.remove(primaryBadge);
+                        badges.add(0, primaryBadge);
+                }
 
                 return new BadgeMyPageInfoDto(
                         member.getBadge().getId(),
