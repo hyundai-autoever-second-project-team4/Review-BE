@@ -7,6 +7,9 @@ import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.movie.exception.MovieIdNotFoundException;
 import hyundai.movie_review.movie.repository.MovieRepository;
+import hyundai.movie_review.movie_genre.entity.MovieGenre;
+import hyundai.movie_review.movie_tag.entity.MovieTag;
+import hyundai.movie_review.movie_tag.repository.MovieTagRepository;
 import hyundai.movie_review.review.dto.*;
 import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.review.event.ReviewScoreEvent;
@@ -15,6 +18,9 @@ import hyundai.movie_review.review.exception.ReviewAuthorMismatchException;
 import hyundai.movie_review.review.exception.ReviewIdNotFoundException;
 import hyundai.movie_review.review.repository.ReviewRepository;
 import hyundai.movie_review.security.MemberResolver;
+import hyundai.movie_review.tag.entity.Tag;
+import hyundai.movie_review.tag.exception.TagIdNotFoundException;
+import hyundai.movie_review.tag.repository.TagRepository;
 import hyundai.movie_review.thear_down.repository.ThearDownRepository;
 import hyundai.movie_review.thear_up.repository.ThearUpRepository;
 import java.time.LocalDateTime;
@@ -36,6 +42,8 @@ public class ReviewService {
     private final MemberResolver memberResolver;
     private final ThearUpRepository thearUpRepository;
     private final ThearDownRepository thearDownRepository;
+    private final TagRepository tagRepository;
+    private final MovieTagRepository movieTagRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
 
@@ -101,6 +109,19 @@ public class ReviewService {
                 .deleted(false)
                 .build();
 
+        // 5) 영화-태그 정보를 저장
+        request.tagIds()
+                .forEach(tagId -> {
+                    Tag tag = tagRepository.findById(tagId)
+                            .orElseThrow(TagIdNotFoundException::new);
+                    MovieTag movieTag = MovieTag.builder()
+                            .movie(movie)
+                            .tag(tag)
+                            .build();
+
+                    movieTagRepository.save(movieTag);
+                });
+
         // 5) 리뷰를 db에 저장
         Review savedReview = reviewRepository.save(review);
 
@@ -156,7 +177,7 @@ public class ReviewService {
         return ReviewDeleteResponse.of(review);
     }
 
-    public ReviewDetailInfoDto getReviewDetail(Long reviewId){
+    public ReviewDetailInfoDto getReviewDetail(Long reviewId) {
         // 1) 리뷰 id로 리뷰 정보 가져오기
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(ReviewIdNotFoundException::new);
@@ -165,7 +186,7 @@ public class ReviewService {
         boolean isLogin = memberResolver.isAuthenticated();
         boolean isThearUp = false;
         boolean isThearDown = false;
-        if(isLogin){
+        if (isLogin) {
             // 3) 리뷰에 up, down 여부 체크
             Member currentMember = memberResolver.getCurrentMember();
             isThearUp = thearUpRepository.existsByMemberIdAndReviewId(currentMember, review);
@@ -179,7 +200,8 @@ public class ReviewService {
         List<CommentGetResponse> commentDtos = comments.stream()
                 .map(comment -> CommentGetResponse.of(comment.getMemberId(), reviewId, comment))
                 .toList();
-        CommentGetAllResponse commentInfo = new CommentGetAllResponse((long)commentDtos.size(), commentDtos);
+        CommentGetAllResponse commentInfo = new CommentGetAllResponse((long) commentDtos.size(),
+                commentDtos);
 
         return ReviewDetailInfoDto.of(reviewInfo, commentInfo);
     }
