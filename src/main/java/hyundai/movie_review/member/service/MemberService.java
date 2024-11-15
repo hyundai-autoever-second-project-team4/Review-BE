@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import hyundai.movie_review.badge.entity.Badge;
 import hyundai.movie_review.badge.exception.BadgeIdNotFoundException;
 import hyundai.movie_review.badge.repository.BadgeRepository;
+import hyundai.movie_review.comment.exception.MemberIdNotFoundException;
 import hyundai.movie_review.genre.dto.GenreCountListDto;
 import hyundai.movie_review.genre.repository.GenreRepository;
 import hyundai.movie_review.image_upload.exception.ImageUploadFailException;
@@ -59,19 +60,24 @@ public class MemberService {
         return MemberInfoResponse.of(currentMember);
     }
 
-    public GetMemberMyPageResponse getMemberMyPageInfo() {
-        // 1) 현재 로그인 한 유저 정보 가져오기
-        Member currentMember = memberResolver.getCurrentMember();
+    public GetMemberMyPageResponse getMemberMyPageInfo(Long memberId) {
+        // 1) 유저 정보 가져오기
+        Member member;
+        if(memberId != null) {
+            member = memberRepository.findById(memberId)
+                    .orElseThrow(MemberIdNotFoundException::new);
+        }
+        else{ member = memberResolver.getCurrentMember(); }
 
         // 2) 유저가 작성한 리뷰의 영화 장르들 가져오기
-        GenreCountListDto genreCountList = genreRepository.getGenreCountByMember(currentMember);
+        GenreCountListDto genreCountList = genreRepository.getGenreCountByMember(member);
 
         // 3) 유저가 작성한 리뷰의 평점 통계 내용을 가져오기
         long[] starRate = new long[10];
         long totalRateCount = 0;
         double averageRate = 0.0, mostRated = 0.0;
 
-        List<Review> reviews = currentMember.getReviews();
+        List<Review> reviews = member.getReviews();
         if (!reviews.isEmpty()) {
             // 평점 분포 배열
             int rateIndex;
@@ -88,9 +94,7 @@ public class MemberService {
             // 가장 많은 평점
             mostRated = reviews.stream()
                     .collect(Collectors.groupingBy(Review::getStarRate, Collectors.counting()))
-                    .entrySet()
-                    .stream()
-                    .max((a, b) -> {
+                    .entrySet().stream().max((a, b) -> {
                         if (a.getValue() == b.getValue()) {
                             return Double.compare(a.getKey(), b.getKey());
                         }
@@ -105,22 +109,36 @@ public class MemberService {
         // 4) 유저가 작성한 리뷰 최신순으로 5개 가져오기
         Pageable pageable = PageRequest.of(0, 5);
         List<Review> reviewList = reviewRepository.findByMemberIdOrderByCreatedAtDesc(
-                currentMember.getId(), pageable);
-        List<ReviewInfoDto> reviewDtoList = reviewList.stream().map(review -> {
-            boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(currentMember,
+                member.getId(), pageable);
+        List<ReviewInfoDto> reviewDtoList;
+        if(memberResolver.isAuthenticated()){
+            Member currentMember = memberResolver.getCurrentMember();
+            reviewDtoList = reviewList.stream().map(review -> {
+                boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(currentMember,
                     review);
-            boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(currentMember,
+                boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(currentMember,
                     review);
-            boolean isWriter = currentMember.equals(review.getMember());
-            return ReviewInfoDto.of(
+                boolean isWriter = currentMember.equals(review.getMember());
+                return ReviewInfoDto.of(
                     review,
                     isThearUp,
                     isThearDown,
                     isWriter
-            );
-        }).toList();
+                );
+            }).toList();
+        }
+        else{
+            reviewDtoList = reviewList.stream().map(review -> {
+                return ReviewInfoDto.of(
+                        review,
+                        false,
+                        false,
+                        false
+                );
+            }).toList();
+        }
 
-        return GetMemberMyPageResponse.of(currentMember, genreCountList, starRateList,
+        return GetMemberMyPageResponse.of(member, genreCountList, starRateList,
                 ReviewInfoListDto.of(reviewDtoList));
     }
 

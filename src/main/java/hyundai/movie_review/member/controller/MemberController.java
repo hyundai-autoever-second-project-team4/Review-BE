@@ -15,12 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,13 +41,27 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "사용자 마이페이지 정보 조회", description = "현재 로그인한 사용자의 마이페이지 정보를 조회합니다.")
+    @Operation(summary = "로그인한 사용자 본인의 마이페이지 정보 조회", description = "현재 로그인한 사용자의 마이페이지 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "마이페이지 정보 조회 성공",
             content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = GetMemberMyPageResponse.class)))
     @GetMapping("/member/mypage")
     public ResponseEntity<?> getMemberMyPageInfo(){
-        GetMemberMyPageResponse response = memberService.getMemberMyPageInfo();
+        GetMemberMyPageResponse response = memberService.getMemberMyPageInfo(null);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 다른 사용자의 마이페이지 정보 조회
+    @Operation(summary = "유저의 마이페이지 정보 조회", description = "멤버 id에 해당하는 사용자의 마이페이지 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "마이페이지 정보 조회 성공",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = GetMemberMyPageResponse.class)))
+    @GetMapping("/member/{memberId}/mypage")
+    public ResponseEntity<?> getOtherUserMyPageInfo(
+            @PathVariable("memberId") Long memberId
+    ){
+        GetMemberMyPageResponse response = memberService.getMemberMyPageInfo(memberId);
 
         return ResponseEntity.ok(response);
     }
