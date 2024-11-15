@@ -58,7 +58,6 @@ public class MemberService {
             int rateIndex;
             for(Review r : reviews){
                 rateIndex = (int) ((r.getStarRate() - 0.5) * 2);
-                log.info("별점 : {} 인덱스 번호 : {}",r.getStarRate(), rateIndex);
                 starRate[rateIndex]++;
             }
 
