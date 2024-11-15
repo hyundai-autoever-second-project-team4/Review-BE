@@ -3,6 +3,7 @@ package hyundai.movie_review.movie.controller;
 import hyundai.movie_review.movie.dto.MovieDetailResponse;
 import hyundai.movie_review.movie.dto.MovieWithRatingListResponse;
 import hyundai.movie_review.movie.service.MovieService;
+import hyundai.movie_review.review.dto.ReviewInfoPageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -97,7 +98,18 @@ public class MovieController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "영화 전체 리뷰 상세 조회",
+            description = "영화 id에 해당하는 리뷰 상세 내용을 조회해 페이지네이션으로 전달, "
+                    +"type에 latest(최신순), likes(좋아요순), ratingHigh(별점높은순), ratingLow(별점낮은순), comments(댓글많은순)를 받는다.")
+    @GetMapping("/movie/{movieId}/reviews")
+    public ResponseEntity<?> getMovieReview(
+            @PathVariable("movieId") Long movieId,
+            @RequestParam(defaultValue = "latest", name = "type") String type,
+            @RequestParam(defaultValue = "0", name = "page") Integer page
+    ){
+        ReviewInfoPageDto response = movieService.getMovieReviewDetail(movieId, type, page);
 
-
+        return ResponseEntity.ok(response);
+    }
 
 }

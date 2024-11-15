@@ -3,6 +3,8 @@ package hyundai.movie_review.review.dto;
 import hyundai.movie_review.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDateTime;
+
 public record ReviewInfoDto(
         @Schema(description = "멤버 id")
         Long memberId,
@@ -28,6 +30,9 @@ public record ReviewInfoDto(
 
         @Schema(description = "리뷰 내용")
         String content,
+
+        @Schema(description = "리뷰 작성시간")
+        LocalDateTime createdAt,
 
         @Schema(description = "스포일러 여부")
         Boolean spoiler,
@@ -63,6 +68,7 @@ public record ReviewInfoDto(
                 review.getId(),
                 review.getStarRate(),
                 review.getContent(),
+                review.getCreatedAt(),
                 review.getSpoiler(),
                 review.getThearUps(),
                 review.getThearDowns(),

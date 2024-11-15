@@ -17,7 +17,21 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
 
     boolean existsByMemberIdAndMovieId(Long memberId, Long movieId);
 
+    // 영화 리뷰 개수
+    long countByMovieId(Long movieId);
+
+    // 영화 리뷰 최신순
+    List<Review> findByMovieIdAndDeletedFalseOrderByCreatedAtDesc(Long movieId, Pageable pageable);
+
+    // 영화 리뷰 up순
     @Query("SELECT r FROM Review r LEFT JOIN r.thearUps t WHERE r.movie.id = :movieId AND r.deleted = false "
     +"GROUP BY r.id ORDER BY COUNT(t) DESC")
-    List<Review> findByMovieId(@Param("movieId") Long movieId, Pageable pageable);
+    List<Review> findByMovieIdOrderByUps(@Param("movieId") Long movieId, Pageable pageable);
+
+    // 영화 리뷰 별점 많은 순
+    List<Review> findByMovieIdAndDeletedFalseOrderByStarRateDesc(Long movieId, Pageable pageable);
+
+    // 영화 리뷰 별점 낮은 순
+    List<Review> findByMovieIdAndDeletedFalseOrderByStarRate(Long movieId, Pageable pageable);
+
 }
