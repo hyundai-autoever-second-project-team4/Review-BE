@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -92,9 +93,13 @@ public class MemberController {
     })
     @PutMapping("/member/update")
     public ResponseEntity<?> updateMemberProfileInfo(
-            @ModelAttribute MemberProfileUpdateRequest request
+//            @ModelAttribute MemberProfileUpdateRequest request
+            @RequestParam(value = "memberName", required = false) String memberName,
+            @RequestParam(value = "memberProfileImg", required = false) MultipartFile memberProfileImg,
+            @RequestParam(value = "primaryBadgeId", required = false) Long primaryBadgeId
     ){
-        MemberProfileUpdateResponse response = memberService.updateMemberInfo(request);
+//        MemberProfileUpdateResponse response = memberService.updateMemberInfo(request);
+        MemberProfileUpdateResponse response = memberService.updateMemberInfo(memberName, memberProfileImg, primaryBadgeId);
 
         return ResponseEntity.ok(response);
     }
