@@ -17,6 +17,10 @@ public record ReviewInfoDto(
 
         @Schema(description = "멤버 티어 이미지 경로")
         String memberTierImg,
+
+        @Schema(description = "멤버 뱃지 이미지 경로")
+        String memberBadgeImg,
+
         @Schema(description = "리뷰에 해당하는 영화 id")
         Long movieId,
         @Schema(description = "리뷰에 해당하는 영화 제목")
@@ -67,6 +71,7 @@ public record ReviewInfoDto(
                 review.getMember().getName(),
                 review.getMember().getProfileImage(),
                 review.getMember().getTier().getImage(),
+                review.getMember().getBadge().getImage(),
                 review.getMovie().getId(),
                 review.getMovie().getTitle(),
                 review.getId(),
