@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -98,9 +99,21 @@ public class ReviewController {
     @GetMapping("/review/{reviewId}")
     public ResponseEntity<?> getReviewDetails(
             @PathVariable("reviewId") Long reviewId
-    ){
+    ) {
         ReviewDetailInfoDto response = reviewService.getReviewDetail(reviewId);
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/member/{memberId}/reviews")
+    public ResponseEntity<?> getReviewsByMemberId(
+            @PathVariable long memberId,
+            @Parameter(example = "likes, latest, ratingHigh, ratingLow, comments 중 택1") @RequestParam(defaultValue = "likes", name = "type") String type,
+            @RequestParam(defaultValue = "0", name = "page") Integer page
+    ) {
+        ReviewInfoPageDto response = reviewService.getReviewsByMemberId(memberId, type, page);
+
+        return ResponseEntity.ok(response);
+    }
+
 }
