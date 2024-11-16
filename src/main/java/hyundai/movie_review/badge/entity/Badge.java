@@ -30,5 +30,7 @@ public class Badge {
     @OneToMany(mappedBy = "badgeId", cascade = CascadeType.REMOVE)
     private List<MemberBadge> memberBadges;
 
-
+    public long getMemberBadgesCount(){
+        return memberBadges.isEmpty() ? 0 : memberBadges.size();
+    }
 }
