@@ -105,15 +105,4 @@ public class ReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/member/{memberId}/reviews")
-    public ResponseEntity<?> getReviewsByMemberId(
-            @PathVariable long memberId,
-            @Parameter(example = "likes, latest, ratingHigh, ratingLow, comments 중 택1") @RequestParam(defaultValue = "likes", name = "type") String type,
-            @RequestParam(defaultValue = "0", name = "page") Integer page
-    ) {
-        ReviewInfoPageDto response = reviewService.getReviewsByMemberId(memberId, type, page);
-
-        return ResponseEntity.ok(response);
-    }
-
 }
