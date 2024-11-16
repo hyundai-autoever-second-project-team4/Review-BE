@@ -10,6 +10,7 @@ import hyundai.movie_review.movie.entity.QMovie;
 import hyundai.movie_review.movie_genre.entity.QMovieGenre;
 import hyundai.movie_review.review.entity.QReview;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -166,7 +167,18 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = movies.size();
+        // 총 개수 계산
+        long total = Objects.requireNonNullElse(
+                queryFactory
+                        .select(movie.count())
+                        .from(movie)
+                        .join(movie.genres, movieGenre)
+                        .join(movieGenre.genre, genre)
+                        .where(Expressions.stringTemplate("lower({0})", genre.name)
+                                .like("%" + genreName.toLowerCase() + "%"))
+                        .fetchOne(),
+                0L
+        );
 
         return new PageImpl<>(movies, pageable, total);
     }
