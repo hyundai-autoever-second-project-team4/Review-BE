@@ -144,36 +144,42 @@ public class MemberService {
                 ReviewInfoListDto.of(reviewDtoList));
     }
 
-    public MemberProfileUpdateResponse updateMemberInfo(MemberProfileUpdateRequest request) {
+    public MemberProfileUpdateResponse updateMemberInfo(String memberName,MultipartFile memberProfileImg, Long primaryBadgeId) {
         Member currentMember = memberResolver.getCurrentMember();
 
-        // 멤버가 획득한 뱃지인지 체크
-        MemberBadge m = currentMember.getMemberBadges().stream()
-                .filter(memberBadge -> memberBadge.getBadgeId().getId().equals(request.primaryBadgeId()))
-                .findAny()
-                .orElseThrow(MemberBadgeNotFoundException::new);
-        Badge primaryBadge = badgeRepository.findById(request.primaryBadgeId())
-                .orElseThrow(BadgeIdNotFoundException::new);
+        // 뱃지 업데이트
+        if(primaryBadgeId != null){
+            // 멤버가 획득한 뱃지인지 체크
+            MemberBadge m = currentMember.getMemberBadges().stream()
+                    .filter(memberBadge -> memberBadge.getBadgeId().getId().equals(primaryBadgeId))
+                    .findAny()
+                    .orElseThrow(MemberBadgeNotFoundException::new);
+            Badge primaryBadge = badgeRepository.findById(primaryBadgeId)
+                    .orElseThrow(BadgeIdNotFoundException::new);
 
+            currentMember.setBadge(primaryBadge);
+        }
+
+        //이미지 업데이트
         String profileImage = currentMember.getProfileImage();
 
         // S3에 프로필 이미지 저장해서 수정
-        if (!request.memberProfileImg().isEmpty()) {
+        if (memberProfileImg != null) {
             try {
                 // 사진 업로드가 성공적으로 되었다면, profile image를 변경
-                profileImage = imageUploadService.upload(request.memberProfileImg(),
+                profileImage = imageUploadService.upload(memberProfileImg,
                         "profiles");
             } catch (IOException e) {
                 throw new ImageUploadFailException();
             }
+            currentMember.setProfileImage(profileImage);
         }
 
-        // 프로필 변경 사항 저장
-        if(request.memberName() != null){
-            currentMember.setName(request.memberName());
+        // 이름 업데이트
+        if(memberName != null){
+            currentMember.setName(memberName);
         }
-        currentMember.setProfileImage(profileImage);
-        currentMember.setBadge(primaryBadge);
+
 
         // 변경된 사항 저장
         memberRepository.save(currentMember);
