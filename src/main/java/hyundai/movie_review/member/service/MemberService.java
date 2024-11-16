@@ -15,6 +15,8 @@ import hyundai.movie_review.member.dto.MemberProfileUpdateRequest;
 import hyundai.movie_review.member.dto.MemberProfileUpdateResponse;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.repository.MemberRepository;
+import hyundai.movie_review.member_badge.entity.MemberBadge;
+import hyundai.movie_review.member_badge.exception.MemberBadgeNotFoundException;
 import hyundai.movie_review.review.dto.ReviewCountArrayDto;
 import hyundai.movie_review.review.dto.ReviewInfoDto;
 import hyundai.movie_review.review.dto.ReviewInfoListDto;
@@ -144,6 +146,12 @@ public class MemberService {
 
     public MemberProfileUpdateResponse updateMemberInfo(MemberProfileUpdateRequest request) {
         Member currentMember = memberResolver.getCurrentMember();
+
+        // 멤버가 획득한 뱃지인지 체크
+        MemberBadge m = currentMember.getMemberBadges().stream()
+                .filter(memberBadge -> memberBadge.getBadgeId().getId().equals(request.primaryBadgeId()))
+                .findAny()
+                .orElseThrow(MemberBadgeNotFoundException::new);
         Badge primaryBadge = badgeRepository.findById(request.primaryBadgeId())
                 .orElseThrow(BadgeIdNotFoundException::new);
 
@@ -161,7 +169,9 @@ public class MemberService {
         }
 
         // 프로필 변경 사항 저장
-        currentMember.setName(request.memberName());
+        if(request.memberName() != null){
+            currentMember.setName(request.memberName());
+        }
         currentMember.setProfileImage(profileImage);
         currentMember.setBadge(primaryBadge);
 
