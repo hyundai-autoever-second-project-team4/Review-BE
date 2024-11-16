@@ -7,7 +7,9 @@ import hyundai.movie_review.member.dto.MemberProfileUpdateRequest;
 import hyundai.movie_review.member.dto.MemberProfileUpdateResponse;
 import hyundai.movie_review.member.service.MemberService;
 import hyundai.movie_review.movie.dto.MovieDetailResponse;
+import hyundai.movie_review.review.dto.ReviewInfoPageDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -101,4 +103,21 @@ public class MemberController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @Operation(summary = "사용자에 대한 리뷰 전체 조회",
+            description = "사용자 id에 해당하는 리뷰 상세 내용을 조회해 페이지네이션으로 전달, "
+                    +"type에 likes(좋아요순), latest(최신순), ratingHigh(별점높은순), ratingLow(별점낮은순), comments(댓글많은순)를 받는다.")
+    @GetMapping("/member/{memberId}/reviews")
+    public ResponseEntity<?> getReviewsByMemberId(
+            @PathVariable long memberId,
+            @Parameter(example = "likes, latest, ratingHigh, ratingLow, comments 중 택1") @RequestParam(defaultValue = "likes", name = "type") String type,
+            @RequestParam(defaultValue = "0", name = "page") Integer page
+    ) {
+        ReviewInfoPageDto response = memberService.getReviewsByMemberId(memberId, type, page);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

@@ -15,11 +15,13 @@ import hyundai.movie_review.member.dto.MemberProfileUpdateRequest;
 import hyundai.movie_review.member.dto.MemberProfileUpdateResponse;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.repository.MemberRepository;
+import hyundai.movie_review.movie.exception.MovieReviewTypeNotFound;
 import hyundai.movie_review.member_badge.entity.MemberBadge;
 import hyundai.movie_review.member_badge.exception.MemberBadgeNotFoundException;
 import hyundai.movie_review.review.dto.ReviewCountArrayDto;
 import hyundai.movie_review.review.dto.ReviewInfoDto;
 import hyundai.movie_review.review.dto.ReviewInfoListDto;
+import hyundai.movie_review.review.dto.ReviewInfoPageDto;
 import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.review.repository.ReviewRepository;
 import hyundai.movie_review.security.MemberResolver;
@@ -29,6 +31,8 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -186,6 +190,80 @@ public class MemberService {
 
         return MemberProfileUpdateResponse.of(currentMember.getId());
     }
+
+    public ReviewInfoPageDto getReviewsByMemberId(long memberId, String type, Integer page) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(MemberIdNotFoundException::new);
+
+        Pageable pageable = PageRequest.of(page, 10);
+
+        // 1) 정렬 타입에 따라 리뷰 가져오기
+        List<Review> reviews;
+        //최신순
+        if (type.equals("latest")) {
+            reviews = reviewRepository.findByMemberAndDeletedFalseOrderByCreatedAtDesc(member,
+                    pageable);
+        }
+        //up 순
+        else if (type.equals("likes")) {
+            reviews = reviewRepository.findByMemberOrderByUps(member, pageable);
+        }
+        //별점높은순
+        else if (type.equals("ratingHigh")) {
+            reviews = reviewRepository.findByMemberAndDeletedFalseOrderByStarRateDesc(member,
+                    pageable);
+        }
+        //별점낮은순
+        else if (type.equals("ratingLow")) {
+            reviews = reviewRepository.findByMemberAndDeletedFalseOrderByStarRate(member,
+                    pageable);
+        }
+        //댓글많은순(선택)
+        else if (type.equals("comments")) {
+            reviews = reviewRepository.findByMemberOrderByComments(member, pageable);
+        } else {
+            throw new MovieReviewTypeNotFound();
+        }
+
+        // 2) 현재 로그인 한 멤버인지 확인
+        boolean isLoggedIn = memberResolver.isAuthenticated();
+        List<ReviewInfoDto> reviewInfoList;
+        if (isLoggedIn) {
+            Member currentMember = memberResolver.getCurrentMember();
+            reviewInfoList = reviews.stream()
+                    .map(review -> {
+                        boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(
+                                currentMember,
+                                review);
+                        boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(
+                                currentMember,
+                                review);
+                        boolean isWriter = currentMember.equals(review.getMember());
+                        return ReviewInfoDto.of(
+                                review,
+                                isThearUp,
+                                isThearDown,
+                                isWriter
+                        );
+                    }).toList();
+        } else {
+            reviewInfoList = reviews.stream()
+                    .map(review -> {
+                        return ReviewInfoDto.of(
+                                review,
+                                false,
+                                false,
+                                false
+                        );
+                    }).toList();
+        }
+
+        // 3) 페이지네이션으로 return
+        long total = reviewRepository.countByMember(member);
+        Page<ReviewInfoDto> reviewInfoPage = new PageImpl<>(reviewInfoList, pageable, total);
+        return ReviewInfoPageDto.of(reviewInfoPage);
+    }
+
 
 
 }

@@ -13,6 +13,8 @@ import hyundai.movie_review.review.dto.ReviewCountListDto;
 import hyundai.movie_review.review.dto.*;
 import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.review.repository.ReviewRepository;
+import hyundai.movie_review.tag.dto.TagInfoListDto;
+import hyundai.movie_review.tag.service.TagService;
 import java.util.List;
 
 import hyundai.movie_review.security.MemberResolver;
@@ -35,6 +37,7 @@ public class MovieService {
     private final ReviewRepository reviewRepository;
     private final ThearUpRepository thearUpRepository;
     private final ThearDownRepository thearDownRepository;
+    private final TagService tagService;
     private final MemberResolver memberResolver;
 
     public MovieDetailResponse getMovieDetail(Long movieId) {
@@ -55,7 +58,8 @@ public class MovieService {
         boolean isReviewed = false;
         if (isLogin) {
             Member member = memberResolver.getCurrentMember();
-            isReviewed = reviewRepository.existsByMemberIdAndMovieIdAndDeletedFalse(member.getId(), movieId);
+            isReviewed = reviewRepository.existsByMemberIdAndMovieIdAndDeletedFalse(member.getId(),
+                    movieId);
             reviewInfoList = reviews.stream().map(review -> {
                 boolean isThearUp = thearUpRepository.existsByMemberIdAndReviewId(member, review);
                 boolean isThearDown = thearDownRepository.existsByMemberIdAndReviewId(member,
@@ -82,9 +86,13 @@ public class MovieService {
             }).toList();
         }
 
+        // 상위 태그 3개 조회
+        TagInfoListDto tagInfoListDto = tagService.getTopTags(movie.getTags());
+
         ReviewInfoListDto reviewInfoListDto = ReviewInfoListDto.of(reviewInfoList);
 
-        return MovieDetailResponse.of(isReviewed, movie, reviewCountListDto, reviewInfoListDto);
+        return MovieDetailResponse.of(isReviewed, movie, reviewCountListDto, reviewInfoListDto,
+                tagInfoListDto);
     }
 
     public MovieWithRatingListResponse getMoviesByHighestRatingThisWeek() {
@@ -142,27 +150,41 @@ public class MovieService {
         return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
     }
 
-    public ReviewInfoPageDto getMovieReviewDetail(Long movieId, String type, Integer page){
+    public ReviewInfoPageDto getMovieReviewDetail(Long movieId, String type, Integer page) {
         Pageable pageable = PageRequest.of(page, 10);
 
         // 1) 정렬 타입에 따라 리뷰 가져오기
         List<Review> reviews;
         //최신순
-        if(type.equals("latest")){ reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByCreatedAtDesc(movieId, pageable); }
+        if (type.equals("latest")) {
+            reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByCreatedAtDesc(movieId,
+                    pageable);
+        }
         //up 순
-        else if(type.equals("likes")){ reviews = reviewRepository.findByMovieIdOrderByUps(movieId, pageable); }
+        else if (type.equals("likes")) {
+            reviews = reviewRepository.findByMovieIdOrderByUps(movieId, pageable);
+        }
         //별점높은순
-        else if(type.equals("ratingHigh")){ reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByStarRateDesc(movieId, pageable); }
+        else if (type.equals("ratingHigh")) {
+            reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByStarRateDesc(movieId,
+                    pageable);
+        }
         //별점낮은순
-        else if(type.equals("ratingLow")){ reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByStarRate(movieId, pageable); }
+        else if (type.equals("ratingLow")) {
+            reviews = reviewRepository.findByMovieIdAndDeletedFalseOrderByStarRate(movieId,
+                    pageable);
+        }
         //댓글많은순(선택)
-        else if(type.equals("comments")){ reviews = reviewRepository.findByMovieIdOrderByComments(movieId, pageable); }
-        else{ throw new MovieReviewTypeNotFound(); }
+        else if (type.equals("comments")) {
+            reviews = reviewRepository.findByMovieIdOrderByComments(movieId, pageable);
+        } else {
+            throw new MovieReviewTypeNotFound();
+        }
 
         // 2) 현재 로그인 한 멤버인지 확인
         boolean isLoggedIn = memberResolver.isAuthenticated();
         List<ReviewInfoDto> reviewInfoList;
-        if(isLoggedIn){
+        if (isLoggedIn) {
             Member member = memberResolver.getCurrentMember();
             reviewInfoList = reviews.stream()
                     .map(review -> {
@@ -179,8 +201,7 @@ public class MovieService {
                                 isWriter
                         );
                     }).toList();
-        }
-        else{
+        } else {
             reviewInfoList = reviews.stream()
                     .map(review -> {
                         return ReviewInfoDto.of(
