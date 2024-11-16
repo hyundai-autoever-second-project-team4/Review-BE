@@ -3,9 +3,12 @@ package hyundai.movie_review.review.service;
 import hyundai.movie_review.comment.dto.CommentGetAllResponse;
 import hyundai.movie_review.comment.dto.CommentGetResponse;
 import hyundai.movie_review.comment.entity.Comment;
+import hyundai.movie_review.comment.exception.MemberIdNotFoundException;
 import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.member.repository.MemberRepository;
 import hyundai.movie_review.movie.entity.Movie;
 import hyundai.movie_review.movie.exception.MovieIdNotFoundException;
+import hyundai.movie_review.movie.exception.MovieReviewTypeNotFound;
 import hyundai.movie_review.movie.repository.MovieRepository;
 import hyundai.movie_review.movie_genre.entity.MovieGenre;
 import hyundai.movie_review.movie_tag.entity.MovieTag;
@@ -29,6 +32,10 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +51,7 @@ public class ReviewService {
     private final ThearDownRepository thearDownRepository;
     private final TagRepository tagRepository;
     private final MovieTagRepository movieTagRepository;
+    private final MemberRepository memberRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
 
