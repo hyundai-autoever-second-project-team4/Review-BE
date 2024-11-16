@@ -44,7 +44,9 @@ public record MovieDetailResponse(
         ReviewInfoListDto reviewInfoList
 ) {
 
-    public static MovieDetailResponse of(boolean isReviewed, Movie movie, ReviewCountListDto reviewCountListDto, ReviewInfoListDto reviewByMovieIdListDto) {
+    public static MovieDetailResponse of(boolean isReviewed, Movie movie,
+            ReviewCountListDto reviewCountListDto, ReviewInfoListDto reviewByMovieIdListDto,
+            TagInfoListDto tagInfoListDto) {
         return new MovieDetailResponse(
                 isReviewed,
                 movie.getId(),
@@ -53,7 +55,7 @@ public record MovieDetailResponse(
                 DirectorInfoListDto.of(movie.getDirectors()),
                 GalleryInfoListDto.of(movie.getGalleries()),
                 GenreInfoListDto.of(movie.getGenres()),
-                TagInfoListDto.of(movie.getTags()),
+                tagInfoListDto,
                 reviewCountListDto,
                 reviewByMovieIdListDto
         );
