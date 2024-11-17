@@ -120,6 +120,10 @@ public class CommentService {
                 Sort.by(Sort.Direction.ASC, "createdAt"));
         Page<Comment> commentList = commentRepository.findByReviewId(review, pageRequest);
 
+        Long currentMemberId;
+        if(memberResolver.isAuthenticated()){ currentMemberId = memberResolver.getCurrentMember().getId(); }
+        else{ currentMemberId = null; }
+
         List<CommentGetResponse> comments = commentList.getContent().stream()
                 .map(
                         comment -> {
@@ -130,7 +134,7 @@ public class CommentService {
                                     member.getId());
                             log.info("{}",
                                     memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
-                            return CommentGetResponse.of(member, reviewId, comment);
+                            return CommentGetResponse.of(member, reviewId, comment, currentMemberId);
                         }
                 ).toList();
 
@@ -153,6 +157,10 @@ public class CommentService {
         log.info("{}", memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
         MemberBadgeAndTierDto dto = memberRepository.getTierAndBadgeImgByMemberId(member.getId());
 
-        return CommentGetResponse.of(member, comment.getReviewId().getId(), comment);
+        Long currentMemberId;
+        if(memberResolver.isAuthenticated()){ currentMemberId = memberResolver.getCurrentMember().getId(); }
+        else{ currentMemberId = null; }
+
+        return CommentGetResponse.of(member, comment.getReviewId().getId(), comment, currentMemberId);
     }
 }

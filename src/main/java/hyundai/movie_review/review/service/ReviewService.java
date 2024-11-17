@@ -195,26 +195,30 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(ReviewIdNotFoundException::new);
 
-        // 2) 로그인한 사용자인지 확인
         boolean isLogin = memberResolver.isAuthenticated();
         boolean isThearUp = false;
         boolean isThearDown = false;
-        boolean isWriter = false;
+        boolean isReviewWriter = false;
+        Long currentMemberId;
+
+        // 2) 로그인한 사용자인지 확인
         if (isLogin) {
             // 3) 리뷰에 up, down 여부 체크
             Member currentMember = memberResolver.getCurrentMember();
+            currentMemberId = currentMember.getId();
             isThearUp = thearUpRepository.existsByMemberIdAndReviewId(currentMember, review);
             isThearDown = thearDownRepository.existsByMemberIdAndReviewId(currentMember, review);
-            isWriter = currentMember.equals(review.getMember());
+            isReviewWriter = currentMember.equals(review.getMember());
         }
+        else{ currentMemberId = null; }
 
-        ReviewInfoDto reviewInfo = ReviewInfoDto.of(review, isThearUp, isThearDown, isWriter);
+        ReviewInfoDto reviewInfo = ReviewInfoDto.of(review, isThearUp, isThearDown, isReviewWriter);
 
         // 4) 리뷰의 댓글 정보 가져오기
         Pageable pageable = PageRequest.of(page, 10);
         Page<Comment> comments = commentRepository.findByReviewId(review, pageable);
         List<CommentGetResponse> commentDtos = comments.stream()
-                .map(comment -> CommentGetResponse.of(comment.getMemberId(), reviewId, comment))
+                .map(comment -> CommentGetResponse.of(comment.getMemberId(), reviewId, comment, currentMemberId))
                 .toList();
 
         Page<CommentGetResponse> commentsPage = new PageImpl<>(commentDtos, pageable, review.getCommentCounts());

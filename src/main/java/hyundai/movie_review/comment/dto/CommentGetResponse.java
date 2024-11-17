@@ -33,9 +33,16 @@ public record CommentGetResponse (
         String content,
 
         @Schema(description = "댓글 생성날짜", example = "2024-11-11T12:37:29.3846313")
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+
+        @Schema(description = "작성자 여부", example = "false")
+        boolean user
 ){
-        public static CommentGetResponse of(Member member, Long reviewId, Comment comment){
+        public static CommentGetResponse of(Member member, Long reviewId, Comment comment, Long currentMemberId){
+                boolean user;
+                if (currentMemberId == comment.getMemberId().getId()){ user = true; }
+                else { user = false; }
+
                 return new CommentGetResponse(
                         comment.getId(),
                         reviewId,
@@ -45,7 +52,8 @@ public record CommentGetResponse (
                         member.getTier().getImage(),
                         member.getBadge().getImage(),
                         comment.getContent(),
-                        comment.getCreatedAt()
+                        comment.getCreatedAt(),
+                        user
                 );
         }
 }
