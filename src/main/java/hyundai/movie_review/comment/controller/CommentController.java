@@ -97,7 +97,7 @@ public class CommentController {
     @GetMapping("{reviewId}/comments")
     public ResponseEntity<?> getAllComment(
             @PathVariable Long reviewId,
-            @RequestParam("page") Integer page
+            @RequestParam(value = "page", defaultValue = "0") Integer page
     ){
         CommentGetAllResponse comments = commentService.getAllComments(reviewId, page);
         return ResponseEntity.ok(comments);

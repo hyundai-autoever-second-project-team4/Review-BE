@@ -98,9 +98,10 @@ public class ReviewController {
                     schema = @Schema(implementation = ReviewDetailInfoDto.class)))
     @GetMapping("/review/{reviewId}")
     public ResponseEntity<?> getReviewDetails(
-            @PathVariable("reviewId") Long reviewId
+            @PathVariable("reviewId") Long reviewId,
+            @RequestParam(value = "page", defaultValue = "0") Integer page
     ) {
-        ReviewDetailInfoDto response = reviewService.getReviewDetail(reviewId);
+        ReviewDetailInfoDto response = reviewService.getReviewDetail(reviewId, page);
 
         return ResponseEntity.ok(response);
     }

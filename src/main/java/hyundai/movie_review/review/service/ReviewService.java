@@ -4,6 +4,7 @@ import hyundai.movie_review.comment.dto.CommentGetAllResponse;
 import hyundai.movie_review.comment.dto.CommentGetResponse;
 import hyundai.movie_review.comment.entity.Comment;
 import hyundai.movie_review.comment.exception.MemberIdNotFoundException;
+import hyundai.movie_review.comment.repository.CommentRepository;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.repository.MemberRepository;
 import hyundai.movie_review.movie.entity.Movie;
@@ -45,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final CommentRepository commentRepository;
     private final MovieRepository movieRepository;
     private final MemberResolver memberResolver;
     private final ThearUpRepository thearUpRepository;
@@ -188,7 +190,7 @@ public class ReviewService {
         return ReviewDeleteResponse.of(review);
     }
 
-    public ReviewDetailInfoDto getReviewDetail(Long reviewId) {
+    public ReviewDetailInfoDto getReviewDetail(Long reviewId, Integer page) {
         // 1) 리뷰 id로 리뷰 정보 가져오기
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(ReviewIdNotFoundException::new);
@@ -209,12 +211,15 @@ public class ReviewService {
         ReviewInfoDto reviewInfo = ReviewInfoDto.of(review, isThearUp, isThearDown, isWriter);
 
         // 4) 리뷰의 댓글 정보 가져오기
-        List<Comment> comments = review.getComments();
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<Comment> comments = commentRepository.findByReviewId(review, pageable);
         List<CommentGetResponse> commentDtos = comments.stream()
                 .map(comment -> CommentGetResponse.of(comment.getMemberId(), reviewId, comment))
                 .toList();
+
+        Page<CommentGetResponse> commentsPage = new PageImpl<>(commentDtos, pageable, review.getCommentCounts());
         CommentGetAllResponse commentInfo = new CommentGetAllResponse((long) commentDtos.size(),
-                commentDtos);
+                commentsPage);
 
         return ReviewDetailInfoDto.of(reviewInfo, commentInfo);
     }

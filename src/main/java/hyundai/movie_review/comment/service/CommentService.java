@@ -21,10 +21,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -137,9 +134,11 @@ public class CommentService {
                         }
                 ).toList();
 
+        Page<CommentGetResponse> commentsPage = new PageImpl<>(comments, pageRequest, review.getCommentCounts());
+
         return new CommentGetAllResponse(
                 commentList.getTotalElements(),
-                comments
+                commentsPage
         );
 
     }
