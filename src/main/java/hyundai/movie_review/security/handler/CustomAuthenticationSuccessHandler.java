@@ -56,7 +56,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private void addCookie(HttpServletResponse response, String name, String value, String domain) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setPath("/");
         cookie.setDomain(domain.contains("localhost") ? "localhost" : "theaterup.site");
         cookie.setSecure(!domain.contains("localhost")); // Secure only in production

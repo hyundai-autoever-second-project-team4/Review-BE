@@ -100,7 +100,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void addCookie(HttpServletResponse response, String name, String value, String domain) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setPath("/");
         cookie.setDomain(domain.contains("localhost") ? "localhost" : "theaterup.site");
         cookie.setSecure(!domain.contains("localhost")); // 배포 환경에서는 Secure 속성 활성화
