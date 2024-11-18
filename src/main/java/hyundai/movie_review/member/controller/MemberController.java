@@ -3,10 +3,8 @@ package hyundai.movie_review.member.controller;
 import hyundai.movie_review.exception.BusinessExceptionResponse;
 import hyundai.movie_review.member.dto.GetMemberMyPageResponse;
 import hyundai.movie_review.member.dto.MemberInfoResponse;
-import hyundai.movie_review.member.dto.MemberProfileUpdateRequest;
 import hyundai.movie_review.member.dto.MemberProfileUpdateResponse;
 import hyundai.movie_review.member.service.MemberService;
-import hyundai.movie_review.movie.dto.MovieDetailResponse;
 import hyundai.movie_review.review.dto.ReviewInfoPageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,7 +18,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,9 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "Member", description = "사용자 관련 API")
 public class MemberController {
 
-    // application.yaml의 redirect-url 설정값을 주입받음
-    @Value("${app.security.redirect-url}")
-    private String redirectUrl;
     private final MemberService memberService;
 
     @Operation(summary = "사용자 정보 조회", description = "현재 로그인 한 사용자 상세 정보를 조회합니다.")
@@ -55,9 +49,9 @@ public class MemberController {
     @Operation(summary = "로그인한 사용자 본인의 마이페이지 정보 조회", description = "현재 로그인한 사용자의 마이페이지 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "마이페이지 정보 조회 성공",
             content = @Content(mediaType = "application/json",
-            schema = @Schema(implementation = GetMemberMyPageResponse.class)))
+                    schema = @Schema(implementation = GetMemberMyPageResponse.class)))
     @GetMapping("/member/mypage")
-    public ResponseEntity<?> getMemberMyPageInfo(){
+    public ResponseEntity<?> getMemberMyPageInfo() {
         GetMemberMyPageResponse response = memberService.getMemberMyPageInfo(null);
 
         return ResponseEntity.ok(response);
@@ -71,7 +65,7 @@ public class MemberController {
     @GetMapping("/member/{memberId}/mypage")
     public ResponseEntity<?> getOtherUserMyPageInfo(
             @PathVariable("memberId") Long memberId
-    ){
+    ) {
         GetMemberMyPageResponse response = memberService.getMemberMyPageInfo(memberId);
 
         return ResponseEntity.ok(response);
@@ -80,19 +74,19 @@ public class MemberController {
     @Operation(
             summary = "사용자 정보 수정",
             description = """
-                요청 예시:
-                <ul>
-                <li><b>HTTP 메서드:</b> PUT</li>
-                <li><b>URL:</b> /member/update</li>
-                <li><b>헤더:</b> Content-Type: multipart/form-data</li>
-                <li><b>본문:</b></li>
-                <ul>
-                    <li>memberName: 영화 팬</li>
-                    <li>memberProfileImg: 선택한 이미지 파일</li>
-                    <li>primaryBadgeId: 2</li>
-                </ul>
-                </ul>
-                """
+                    요청 예시:
+                    <ul>
+                    <li><b>HTTP 메서드:</b> PUT</li>
+                    <li><b>URL:</b> /member/update</li>
+                    <li><b>헤더:</b> Content-Type: multipart/form-data</li>
+                    <li><b>본문:</b></li>
+                    <ul>
+                        <li>memberName: 영화 팬</li>
+                        <li>memberProfileImg: 선택한 이미지 파일</li>
+                        <li>primaryBadgeId: 2</li>
+                    </ul>
+                    </ul>
+                    """
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "업데이트 성공"),
@@ -105,9 +99,10 @@ public class MemberController {
             @RequestParam(value = "memberName", required = false) String memberName,
             @RequestParam(value = "memberProfileImg", required = false) MultipartFile memberProfileImg,
             @RequestParam(value = "primaryBadgeId", required = false) Long primaryBadgeId
-    ){
+    ) {
 //        MemberProfileUpdateResponse response = memberService.updateMemberInfo(request);
-        MemberProfileUpdateResponse response = memberService.updateMemberInfo(memberName, memberProfileImg, primaryBadgeId);
+        MemberProfileUpdateResponse response = memberService.updateMemberInfo(memberName,
+                memberProfileImg, primaryBadgeId);
 
         return ResponseEntity.ok(response);
     }
@@ -115,7 +110,7 @@ public class MemberController {
 
     @Operation(summary = "사용자에 대한 리뷰 전체 조회",
             description = "사용자 id에 해당하는 리뷰 상세 내용을 조회해 페이지네이션으로 전달, "
-                    +"type에 likes(좋아요순), latest(최신순), ratingHigh(별점높은순), ratingLow(별점낮은순), comments(댓글많은순)를 받는다.")
+                    + "type에 likes(좋아요순), latest(최신순), ratingHigh(별점높은순), ratingLow(별점낮은순), comments(댓글많은순)를 받는다.")
     @GetMapping("/member/{memberId}/reviews")
     public ResponseEntity<?> getReviewsByMemberId(
             @PathVariable long memberId,
@@ -129,12 +124,9 @@ public class MemberController {
 
     @Operation(description = "사용자 로그아웃 엔드포인트")
     @PostMapping("/member/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
         addCookie(response, "accessToken", "", request.getServerName());
         addCookie(response, "refreshToken", "", request.getServerName());
-
-        response.sendRedirect(redirectUrl);
     }
 
     private void addCookie(HttpServletResponse response, String name, String value, String domain) {
