@@ -1,9 +1,14 @@
 package hyundai.movie_review.member.dto;
 
+import hyundai.movie_review.alarm.dto.AlarmResponse;
+import hyundai.movie_review.alarm.entity.Alarm;
 import hyundai.movie_review.badge.dto.BadgeInfoDto;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.tier.dto.TierInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public record MemberInfoResponse(
         @Schema(description = "회원 ID", example = "1")
@@ -25,7 +30,10 @@ public record MemberInfoResponse(
         BadgeInfoDto badge,
 
         @Schema(description = "회원의 티어 정보")
-        TierInfoDto tier
+        TierInfoDto tier,
+
+        @Schema(description = "회원이 안읽은 알람 정보")
+        List<AlarmResponse> alarms
 ) {
 
     public static MemberInfoResponse of(Member member) {
@@ -36,7 +44,11 @@ public record MemberInfoResponse(
                 member.getProfileImage(),
                 member.getSocial(),
                 BadgeInfoDto.of(member.getBadge()),
-                TierInfoDto.of(member.getTier())
+                TierInfoDto.of(member.getTier()),
+                member.getAlarms().stream()
+                        .sorted(Comparator.comparing(Alarm::getCreatedAt).reversed())
+                        .map(AlarmResponse::of)
+                        .collect(Collectors.toList())
         );
     }
 

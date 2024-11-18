@@ -8,13 +8,17 @@ import org.springframework.context.ApplicationEvent;
 public class ThearDownScoreEvent extends ApplicationEvent {
 
     private static final long THEAR_DOWN_SCORE_VALUE = 0;
-    private final Member member;
+    private final Member giver;
+    private final Member receiver;
     private final long scoreAdjustment;
+    private boolean isCreated;
 
-    public ThearDownScoreEvent(Object source, Member member, boolean isCreated) {
+    public ThearDownScoreEvent(Object source, Member giver, Member receiver, boolean isCreated) {
         super(source);
-        this.member = member;
+        this.giver = giver;
+        this.receiver = receiver;
         this.scoreAdjustment = isCreated ? THEAR_DOWN_SCORE_VALUE : -THEAR_DOWN_SCORE_VALUE;
+        this.isCreated = isCreated;
     }
 
 }

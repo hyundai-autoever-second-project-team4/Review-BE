@@ -1,5 +1,6 @@
 package hyundai.movie_review.member.entity;
 
+import hyundai.movie_review.alarm.entity.Alarm;
 import hyundai.movie_review.badge.entity.Badge;
 import hyundai.movie_review.comment.entity.Comment;
 import hyundai.movie_review.member_badge.entity.MemberBadge;
@@ -61,9 +62,13 @@ public class Member {
         this.memberRoles.add(role);
     }
 
-    public void setName(String name){ this.name = name; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public void setProfileImage(String profileImage){ this.profileImage = profileImage; }
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
 
     public void setTier(Tier tier) {
         this.tier = tier;
@@ -97,4 +102,8 @@ public class Member {
     // Review와 연결
     @OneToMany(mappedBy = "member")
     private List<Review> reviews;
+
+    // Alarm과 연결
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Alarm> alarms;
 }

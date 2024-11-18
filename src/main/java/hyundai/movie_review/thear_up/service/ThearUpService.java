@@ -56,7 +56,7 @@ public class ThearUpService {
 
             // 리뷰 작성자에게 포인트를 줘야 하므로, 리뷰 작성자를 전달
             applicationEventPublisher.publishEvent(
-                    new ThearUpScoreEvent(this, review.getMember(), false));
+                    new ThearUpScoreEvent(this, currentMember, review.getMember(), false));
 
             return ThearUpResponse.of("좋아요 삭제 완료");
         } else {
@@ -72,7 +72,7 @@ public class ThearUpService {
 
             // 리뷰 작성자에게 포인트를 줘야 하므로, 리뷰 작성자를 전달
             applicationEventPublisher.publishEvent(
-                    new ThearUpScoreEvent(this, review.getMember(), true));
+                    new ThearUpScoreEvent(this, currentMember, review.getMember(), true));
 
             return ThearUpResponse.of("좋아요 생성 완료");
         }

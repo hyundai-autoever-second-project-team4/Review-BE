@@ -48,6 +48,7 @@ public class SecurityConfig {
                             "http://localhost:5173",  // 로컬 개발 환경에서의 요청 허용
                             "http://localhost:8080",    // 로컬 개발 환경에서의 요청 허용
                             "https://theaterup.site",     // 프론트엔드 CloudFront 도메인
+                            "http://127.0.0.1:5500/",
                             "https://api.theaterup.site"  // 백엔드 EC2 도메인
                             // 배포된 서버의 도메인 추가 예정
                     ));
