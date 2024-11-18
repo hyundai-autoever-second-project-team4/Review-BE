@@ -10,6 +10,7 @@ import hyundai.movie_review.security.exception.CustomJwtException;
 import hyundai.movie_review.security.exception.CustomJwtExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -84,7 +85,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String newAccessToken = jwtTokenProvider.generateAccessToken(claims);
 
             authenticateUser(claims);
-            response.setHeader("Authorization", "Bearer " + newAccessToken);
+
+            // Set the new Access Token as a Cookie
+            addCookie(response, "accessToken", newAccessToken, request.getServerName());
 
             log.info("새로운 accessToken 발급 및 Security Context에 인증 정보 저장 완료");
 
@@ -93,6 +96,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Failed to refresh access token",
                     ex.getClass().getSimpleName());
         }
+    }
+
+    private void addCookie(HttpServletResponse response, String name, String value, String domain) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setDomain(domain.contains("localhost") ? "localhost" : "theaterup.site");
+        cookie.setSecure(!domain.contains("localhost")); // 배포 환경에서는 Secure 속성 활성화
+        cookie.setMaxAge(60 * 60 * 24); // 1일 동안 유효
+        response.addCookie(cookie);
     }
 
     private Map<String, Object> generateClaims(Member member) {

@@ -30,14 +30,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
 
-        // 1. OAuth2User 객체 가져오기
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-
-        // 2. OAuth2UserInfo 객체 생성
         String registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
         OAuth2UserInfo userInfo = OAuth2UserInfo.of(registrationId, oAuth2User.getAttributes());
 
-        // 3. JWT 토큰 생성
+        // Create JWT Tokens
         Map<String, Object> claims = Map.of(
                 "email", userInfo.email(),
                 "name", userInfo.name(),
@@ -49,30 +46,21 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String accessToken = jwtTokenProvider.generateAccessToken(claims);
         String refreshToken = jwtTokenProvider.createRefreshToken(userInfo.email());
 
-        // 현재 서버가 localhost인지 확인하여 개발 환경인지 판단
-        String domain = request.getServerName().contains("localhost") ? "localhost" : "https://theaterup.site/";
-        boolean isSecure = !domain.equals("localhost"); // 배포 환경에서는 true, 로컬 테스트에서는 false
+        // Set Tokens as Cookies
+        addCookie(response, "accessToken", accessToken, request.getServerName());
+        addCookie(response, "refreshToken", refreshToken, request.getServerName());
 
-        // AccessToken 쿠키 설정
-        String accessTokenCookie = String.format(
-                "accessToken=%s; Domain=%s; Path=/; HttpOnly; %s; Max-Age=%d",
-                accessToken,
-                domain,
-                isSecure ? "Secure; SameSite=None" : "", // 배포 환경에서만 보안 속성 추가
-                60 * 60 * 24
-        );
-        response.addHeader("Set-Cookie", accessTokenCookie);
-
-        // RefreshToken 쿠키 설정
-        String refreshTokenCookie = String.format(
-                "refreshToken=%s; Domain=%s; Path=/; HttpOnly; %s; Max-Age=%d",
-                refreshToken,
-                domain,
-                isSecure ? "Secure; SameSite=None" : "",
-                7 * 24 * 60 * 60
-        );
-        response.addHeader("Set-Cookie", refreshTokenCookie);
-
+        // Redirect user to frontend
         response.sendRedirect(redirectUrl);
+    }
+
+    private void addCookie(HttpServletResponse response, String name, String value, String domain) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setDomain(domain.contains("localhost") ? "localhost" : "theaterup.site");
+        cookie.setSecure(!domain.contains("localhost")); // Secure only in production
+        cookie.setMaxAge(name.equals("refreshToken") ? 7 * 24 * 60 * 60 : 24 * 60 * 60); // Refresh: 7 days, Access: 1 day
+        response.addCookie(cookie);
     }
 }
