@@ -1,5 +1,6 @@
 package hyundai.movie_review.alarm.service;
 
+import hyundai.movie_review.alarm.dto.AlarmResponse;
 import hyundai.movie_review.alarm.entity.Alarm;
 import hyundai.movie_review.alarm.repository.AlarmRepository;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class AlarmService {
             try {
                 emitter.send(SseEmitter.event()
                         .name("alarm")
-                        .data(savedAlarm));
+                        .data(AlarmResponse.of(savedAlarm)));
             } catch (IOException e) {
                 userEmitters.remove(memberId); // 전송 실패 시 제거
             }
