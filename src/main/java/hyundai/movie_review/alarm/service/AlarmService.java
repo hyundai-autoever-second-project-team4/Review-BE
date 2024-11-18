@@ -2,7 +2,11 @@ package hyundai.movie_review.alarm.service;
 
 import hyundai.movie_review.alarm.dto.AlarmResponse;
 import hyundai.movie_review.alarm.entity.Alarm;
+import hyundai.movie_review.alarm.exception.AlarmIdNotFoundException;
+import hyundai.movie_review.alarm.exception.AlarmNotAuthorizedException;
 import hyundai.movie_review.alarm.repository.AlarmRepository;
+import hyundai.movie_review.member.entity.Member;
+import hyundai.movie_review.security.MemberResolver;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -19,6 +23,7 @@ public class AlarmService {
 
     private final ConcurrentHashMap<Long, SseEmitter> userEmitters = new ConcurrentHashMap<>();
     private final AlarmRepository alarmRepository;
+    private final MemberResolver memberResolver;
 
     // 사용자 구독
     public SseEmitter subscribe(Long memberId) {
@@ -58,6 +63,21 @@ public class AlarmService {
                 userEmitters.remove(memberId); // 전송 실패 시 제거
             }
         }
+    }
+
+    public void read(long alarmId) {
+        Member currentMember = memberResolver.getCurrentMember();
+
+        Alarm alarm = alarmRepository.findById(alarmId)
+                .orElseThrow(AlarmIdNotFoundException::new);
+
+        if (!currentMember.equals(alarm.getMember())) {
+            throw new AlarmNotAuthorizedException();
+        }
+
+        alarm.readAlarm();
+
+        alarmRepository.save(alarm);
     }
 
 }

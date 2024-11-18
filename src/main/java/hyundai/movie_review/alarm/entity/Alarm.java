@@ -36,4 +36,8 @@ public class Alarm {
     private String message;
     @Column(name = "is_read")
     private boolean isRead;
+
+    public void readAlarm() {
+        this.isRead = true;
+    }
 }
