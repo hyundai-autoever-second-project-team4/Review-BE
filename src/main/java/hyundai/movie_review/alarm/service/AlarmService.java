@@ -2,6 +2,8 @@ package hyundai.movie_review.alarm.service;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,14 +18,15 @@ public class AlarmService {
 
     // 사용자 구독
     public SseEmitter subscribe(Long memberId) {
-        SseEmitter emitter = new SseEmitter(30_000L); // 타임아웃 설정
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE); // 무제한 타임아웃 설정
 
-        // Emitter를 사용자 ID로 저장
-        userEmitters.put(memberId, emitter);
-
-        // 연결 종료/타임아웃 처리
-        emitter.onCompletion(() -> userEmitters.remove(memberId));
-        emitter.onTimeout(() -> userEmitters.remove(memberId));
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            try {
+                emitter.send(SseEmitter.event().comment("keep-alive")); // 주기적 Keep-Alive 메시지
+            } catch (IOException e) {
+                emitter.completeWithError(e); // 연결 문제 시 종료
+            }
+        }, 0, 30, TimeUnit.SECONDS); // 30초마다 Keep-Alive 전송
 
         return emitter;
     }
