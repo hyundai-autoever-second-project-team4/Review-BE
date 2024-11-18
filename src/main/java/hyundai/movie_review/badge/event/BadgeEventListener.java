@@ -1,5 +1,8 @@
 package hyundai.movie_review.badge.event;
 
+import hyundai.movie_review.alarm.entity.Alarm;
+import hyundai.movie_review.alarm.repository.AlarmRepository;
+import hyundai.movie_review.alarm.service.AlarmService;
 import hyundai.movie_review.badge.constant.BadgeConditionByBadgeCount;
 import hyundai.movie_review.badge.constant.BadgeConditionByGenreCount;
 import hyundai.movie_review.badge.constant.BadgeConditionBySpecificReview;
@@ -17,6 +20,9 @@ import hyundai.movie_review.member_badge.repository.MemberBadgeRepository;
 import hyundai.movie_review.movie.vo.MovieGenreCountMap;
 import hyundai.movie_review.movie_genre.entity.MovieGenre;
 import hyundai.movie_review.review.entity.Review;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,8 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class BadgeEventListener {
 
     private final BadgeRepository badgeRepository;
-    private final MemberRepository memberRepository;
     private final MemberBadgeRepository memberBadgeRepository;
+    private final AlarmService alarmService;
+    private final AlarmRepository alarmRepository;
 
     @EventListener
     @Transactional
@@ -163,6 +170,10 @@ public class BadgeEventListener {
                     .badgeId(badge)
                     .build();
             memberBadgeRepository.save(memberBadge);
+
+            // 여기에 이벤트 발생
+            Alarm alarm = createBadgeAlarm(member, badge);
+            alarmService.sendNotificationToUser(member.getId(), alarm);
         }
     }
 
@@ -170,4 +181,22 @@ public class BadgeEventListener {
     private boolean isReceivedBadge(Member member, Badge badge) {
         return memberBadgeRepository.existsByMemberIdAndBadgeId(member, badge);
     }
+
+    private Alarm createBadgeAlarm(Member member, Badge badge) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        String message = String.format("[%d.%d %d:%d] %s 뱃지를 획득하였습니다.",
+                now.getMonthValue(),
+                now.getDayOfMonth(),
+                now.getHour(),
+                now.getMinute(),
+                badge.getName());
+
+        return Alarm.builder()
+                .createdAt(now)
+                .memberId(member.getId())
+                .message(message)
+                .isRead(false)
+                .build();
+    }
+
 }
