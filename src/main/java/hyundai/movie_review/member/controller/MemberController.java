@@ -134,10 +134,10 @@ public class MemberController {
 
     private void invalidateCookie(HttpServletResponse response, String name, String domain) {
         Cookie cookie = new Cookie(name, null); // 쿠키 값을 null로 설정
-        cookie.setHttpOnly(true); // HttpOnly 활성화
-        cookie.setPath("/"); // Path 설정
-        cookie.setDomain(domain.contains("localhost") ? "localhost" : ".theaterup.site"); // 도메인 일치
-        cookie.setSecure(!domain.contains("localhost")); // 배포 환경에서는 Secure 활성화
+        cookie.setHttpOnly(false);
+        cookie.setPath("/");
+        cookie.setDomain(domain.contains("localhost") ? "localhost" : "theaterup.site");
+        cookie.setSecure(!domain.contains("localhost")); // Secure 속성은 배포 환경에서만 활성화
         cookie.setMaxAge(0); // 즉시 만료
         response.addCookie(cookie);
     }
