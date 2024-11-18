@@ -62,8 +62,8 @@ class ReviewServiceTest {
 
         // Review 엔티티 생성
         Review review = Review.builder()
-                .movieId(movie.getId())
-                .memberId(member.getId())
+                .movie(movie)
+                .member(member)
                 .starRate(request.starRate())
                 .content(request.content())
                 .spoiler(request.spoiler())
