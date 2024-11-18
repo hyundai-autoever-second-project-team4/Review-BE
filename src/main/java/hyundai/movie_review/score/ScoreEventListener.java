@@ -9,6 +9,7 @@ import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.member.repository.MemberRepository;
 import hyundai.movie_review.review.event.ReviewScoreEvent;
 import hyundai.movie_review.thear_down.event.ThearDownScoreEvent;
+import hyundai.movie_review.thear_up.entity.ThearUp;
 import hyundai.movie_review.thear_up.event.ThearUpScoreEvent;
 import hyundai.movie_review.tier.constant.TierLevel;
 import hyundai.movie_review.tier.entity.Tier;
@@ -51,14 +52,26 @@ public class ScoreEventListener {
     @Transactional
     public void handleThearUpScoreEvent(ThearUpScoreEvent event) {
         updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
-        log.info("띠어럽 이벤트 처리완료");
+
+        if (event.isCreated()) {
+            Alarm alarm = createThearAlarm(event.getGiver(), event.getReceiver(), "띠어럽👍");
+            alarmService.sendNotificationToUser(event.getReceiver().getId(), alarm);
+
+            log.info("띠어럽 이벤트 처리완료");
+        }
     }
 
     @EventListener
     @Transactional
     public void handleThearDownScoreEvent(ThearDownScoreEvent event) {
         updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
-        log.info("띠어다운 이벤트 처리 완료");
+
+        if (event.isCreated()) {
+            Alarm alarm = createThearAlarm(event.getGiver(), event.getReceiver(), "띠어다운👎");
+            alarmService.sendNotificationToUser(event.getReceiver().getId(), alarm);
+
+            log.info("띠어다운 이벤트 처리 완료");
+        }
     }
 
 
@@ -117,5 +130,22 @@ public class ScoreEventListener {
                 .build();
     }
 
+    private Alarm createThearAlarm(Member giver, Member receiver, String thearMsg) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        String message = String.format("[%d.%d %d:%d] '%s' 님에게 '%s'를 받았습니다.",
+                now.getMonthValue(),
+                now.getDayOfMonth(),
+                now.getHour(),
+                now.getMinute(),
+                giver.getName(),
+                thearMsg);
+
+        return Alarm.builder()
+                .createdAt(now)
+                .memberId(receiver.getId())
+                .message(message)
+                .isRead(false)
+                .build();
+    }
 
 }
