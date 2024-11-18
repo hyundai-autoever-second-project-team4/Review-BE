@@ -18,7 +18,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +30,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "Member", description = "사용자 관련 API")
 public class MemberController {
 
+    // application.yaml의 redirect-url 설정값을 주입받음
+    @Value("${app.security.redirect-url}")
+    private String redirectUrl;
     private final MemberService memberService;
 
     @Operation(summary = "사용자 정보 조회", description = "현재 로그인 한 사용자 상세 정보를 조회합니다.")
@@ -124,9 +129,12 @@ public class MemberController {
 
     @Operation(description = "사용자 로그아웃 엔드포인트")
     @PostMapping("/member/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
+    public void logout(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         addCookie(response, "accessToken", "", request.getServerName());
         addCookie(response, "refreshToken", "", request.getServerName());
+
+        response.sendRedirect(redirectUrl);
     }
 
     private void addCookie(HttpServletResponse response, String name, String value, String domain) {
