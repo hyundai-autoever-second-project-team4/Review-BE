@@ -102,7 +102,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(false);
         cookie.setPath("/");
-        cookie.setDomain(domain.contains("localhost") ? "localhost" : "theaterup.site");
+        cookie.setDomain(domain.contains("localhost") ? "localhost" : "https://theaterup.site");
         cookie.setSecure(!domain.contains("localhost")); // 배포 환경에서는 Secure 속성 활성화
         cookie.setMaxAge(60 * 60 * 24); // 1일 동안 유효
         response.addCookie(cookie);
