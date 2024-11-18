@@ -1,6 +1,7 @@
 package hyundai.movie_review.alarm.controller;
 
 import hyundai.movie_review.alarm.dto.AlarmReadResponse;
+import hyundai.movie_review.alarm.dto.AlarmResponse;
 import hyundai.movie_review.alarm.service.AlarmService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,7 +29,7 @@ public class AlarmController {
             summary = "알람 구독",
             description = "특정 회원 ID를 기준으로 SSE를 통해 알람을 구독합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "SSE 연결 성공", content = @Content(schema = @Schema(implementation = SseEmitter.class))),
+                    @ApiResponse(responseCode = "200", description = "SSE 연결 성공하여 이벤트 메세지 응답", content = @Content(schema = @Schema(implementation = AlarmResponse.class))),
                     @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content),
                     @ApiResponse(responseCode = "404", description = "회원 정보를 찾을 수 없음", content = @Content)
             }
