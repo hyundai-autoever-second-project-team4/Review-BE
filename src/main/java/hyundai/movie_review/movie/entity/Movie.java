@@ -5,11 +5,8 @@ import hyundai.movie_review.director.entity.Director;
 import hyundai.movie_review.gallery.entity.Gallery;
 import hyundai.movie_review.movie_genre.entity.MovieGenre;
 import hyundai.movie_review.movie_tag.entity.MovieTag;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -56,19 +53,19 @@ public class Movie {
     @Column(name = "total_star_rate")
     private Double totalStarRate;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<Actor> actors;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<Director> directors;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<Gallery> galleries;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<MovieGenre> genres;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<MovieTag> tags;
 
     // 리뷰가 생성될 때, 영화에 대한 totalReviewCount, totalStarRate 값을 증가시키는 메소드
