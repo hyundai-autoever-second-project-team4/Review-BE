@@ -125,20 +125,17 @@ public class MemberController {
     @Operation(description = "사용자 로그아웃 엔드포인트")
     @PostMapping("/member/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        // Access Token 삭제
-        invalidateCookie(response, "accessToken", request.getServerName());
-
-        // Refresh Token 삭제
-        invalidateCookie(response, "refreshToken", request.getServerName());
+        addCookie(response, "accessToken", "", request.getServerName());
+        addCookie(response, "refreshToken", "", request.getServerName());
     }
 
-    private void invalidateCookie(HttpServletResponse response, String name, String domain) {
-        Cookie cookie = new Cookie(name, null); // 쿠키 값을 null로 설정
+    private void addCookie(HttpServletResponse response, String name, String value, String domain) {
+        Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(false);
         cookie.setPath("/");
         cookie.setDomain(domain.contains("localhost") ? "localhost" : "theaterup.site");
-        cookie.setSecure(!domain.contains("localhost")); // Secure 속성은 배포 환경에서만 활성화
-        cookie.setMaxAge(0); // 즉시 만료
+        cookie.setSecure(!domain.contains("localhost")); // 배포 환경에서는 Secure 속성 활성화
+        cookie.setMaxAge(0); // 바로 만료
         response.addCookie(cookie);
     }
 
