@@ -132,6 +132,8 @@ public class ScoreEventListener {
                 now.getMinute(),
                 tier.getName());
 
+        log.info("뱃지 알람 생성 : [{}]", message);
+
         return Alarm.builder()
                 .createdAt(now)
                 .member(member)
@@ -149,6 +151,8 @@ public class ScoreEventListener {
                 now.getMinute(),
                 giver.getName(),
                 msg);
+
+        log.info("뱃지 알람 생성 : [{}]", message);
 
         return Alarm.builder()
                 .createdAt(now)

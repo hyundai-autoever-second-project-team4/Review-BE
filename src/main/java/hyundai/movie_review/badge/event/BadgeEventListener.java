@@ -191,6 +191,8 @@ public class BadgeEventListener {
                 now.getMinute(),
                 badge.getName());
 
+        log.info("뱃지 알람 생성 : [{}]", message);
+
         return Alarm.builder()
                 .createdAt(now)
                 .member(member)
