@@ -60,7 +60,7 @@ public class CommentService {
 
         // 4) 생성된 comment에 대한 event 처리
         applicationEventPublisher.publishEvent(
-                new CommentScoreEvent(this, currentMember, comment.getMemberId(), true));
+                new CommentScoreEvent(this, currentMember, review.getMember(), true));
 
         return new CommentCreateResponse(
                 savedComment.getMemberId().getId(),

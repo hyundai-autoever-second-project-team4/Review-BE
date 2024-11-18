@@ -44,7 +44,7 @@ public class ScoreEventListener {
     @EventListener
     @Transactional
     public void handleCommentScoreEvent(CommentScoreEvent event) {
-        updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
+        updateMemberTier(event.getGiver(), event.getScoreAdjustment());
 
         if (event.isCreated()) {
             Alarm alarm = createReceiverAlarm(event.getGiver(), event.getReceiver(),
