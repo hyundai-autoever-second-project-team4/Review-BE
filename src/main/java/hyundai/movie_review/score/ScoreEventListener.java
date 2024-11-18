@@ -63,7 +63,7 @@ public class ScoreEventListener {
 
         if (event.isCreated()) {
             Alarm alarm = createReceiverAlarm(event.getGiver(), event.getReceiver(),
-                    "님에게 '띠어럽👍' 을 받았습니다.");
+                    "님에게 '띠어럽' 을 받았습니다.");
             alarmService.sendNotificationToUser(event.getReceiver().getId(), alarm);
 
             log.info("띠어럽 이벤트 처리완료");
@@ -77,7 +77,7 @@ public class ScoreEventListener {
 
         if (event.isCreated()) {
             Alarm alarm = createReceiverAlarm(event.getGiver(), event.getReceiver(),
-                    "님에게 '띠어다운👎' 을 받았습니다.");
+                    "님에게 '띠어다운' 을 받았습니다.");
             alarmService.sendNotificationToUser(event.getReceiver().getId(), alarm);
 
             log.info("띠어다운 이벤트 처리 완료");
