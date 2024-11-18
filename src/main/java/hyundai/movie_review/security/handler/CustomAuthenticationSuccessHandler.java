@@ -58,7 +58,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(false);
         cookie.setPath("/");
-        cookie.setDomain(domain.contains("localhost") ? "localhost" : "https://theaterup.site");
+        cookie.setDomain(domain.contains("localhost") ? "localhost" : "theaterup.site");
         cookie.setSecure(!domain.contains("localhost")); // Secure only in production
         cookie.setMaxAge(name.equals("refreshToken") ? 7 * 24 * 60 * 60 : 24 * 60 * 60); // Refresh: 7 days, Access: 1 day
         response.addCookie(cookie);
