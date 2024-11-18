@@ -56,15 +56,15 @@ public class Review {
     }
 
     // Comment와 연결
-    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
     // ThearUp과 연결
-    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<ThearUp> thearUps;
 
     // ThearDown과 연결
-    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<ThearDown> thearDowns;
     public long getCommentCounts(){ return comments != null ? (long) comments.size() : 0;}
     public long getThearUps(){
