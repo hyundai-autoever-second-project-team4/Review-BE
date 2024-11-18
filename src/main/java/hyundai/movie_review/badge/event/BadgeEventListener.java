@@ -193,7 +193,7 @@ public class BadgeEventListener {
 
         return Alarm.builder()
                 .createdAt(now)
-                .memberId(member.getId())
+                .member(member)
                 .message(message)
                 .isRead(false)
                 .build();

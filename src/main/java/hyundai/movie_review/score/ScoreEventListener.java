@@ -134,7 +134,7 @@ public class ScoreEventListener {
 
         return Alarm.builder()
                 .createdAt(now)
-                .memberId(member.getId())
+                .member(member)
                 .message(message)
                 .isRead(false)
                 .build();
@@ -152,7 +152,7 @@ public class ScoreEventListener {
 
         return Alarm.builder()
                 .createdAt(now)
-                .memberId(receiver.getId())
+                .member(receiver)
                 .message(message)
                 .isRead(false)
                 .build();
