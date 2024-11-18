@@ -84,26 +84,26 @@ public class Member {
 
 
     // MemberBadge와 연결
-    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<MemberBadge> memberBadges;
 
     // Comment와 연결
-    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
     // ThearUp과 연결
-    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<ThearUp> thearUps;
 
     // ThearDown과 연결
-    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<ThearDown> thearDowns;
 
     // Review와 연결
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Review> reviews;
 
     // Alarm과 연결
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Alarm> alarms;
 }
