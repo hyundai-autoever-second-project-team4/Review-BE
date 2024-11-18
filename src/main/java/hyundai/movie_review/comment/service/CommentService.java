@@ -37,7 +37,7 @@ public class CommentService {
 
     public CommentCreateResponse createComment(CommentCreateRequest request) {
         // 1) 현재 api를 사용하는 멤버 정보를 가져온다.
-        Member member = memberResolver.getCurrentMember();
+        Member currentMember = memberResolver.getCurrentMember();
 
         // 리뷰 id가 존재하지 않는 경우 exception 발생
         Review review = reviewRepository.findById(request.reviewId())
@@ -45,7 +45,7 @@ public class CommentService {
 
         // 2) request + 현재 요청한 멤버 = comment
         Comment comment = Comment.builder()
-                .memberId(member)
+                .memberId(currentMember)
                 .reviewId(review)
                 .content(request.content())
                 .createdAt(LocalDateTime.now())
@@ -55,10 +55,12 @@ public class CommentService {
         // 3) repository (db)에 저장
         Comment savedComment = commentRepository.save(comment);
 
-        log.info("comment 생성 완료 , 멤버 이름 : {}, 코멘트 넘버 {}", member.getName(), savedComment.getId());
+        log.info("comment 생성 완료 , 멤버 이름 : {}, 코멘트 넘버 {}", currentMember.getName(),
+                savedComment.getId());
 
         // 4) 생성된 comment에 대한 event 처리
-        applicationEventPublisher.publishEvent(new CommentScoreEvent(this, member, true));
+        applicationEventPublisher.publishEvent(
+                new CommentScoreEvent(this, currentMember, comment.getMemberId(), true));
 
         return new CommentCreateResponse(
                 savedComment.getMemberId().getId(),
@@ -106,7 +108,8 @@ public class CommentService {
 
         commentRepository.delete(comment);
 
-        applicationEventPublisher.publishEvent(new CommentScoreEvent(this, member, false));
+        applicationEventPublisher.publishEvent(
+                new CommentScoreEvent(this, member, comment.getMemberId(), false));
 
         log.info("코멘트 삭제 완료!");
     }
@@ -121,8 +124,11 @@ public class CommentService {
         Page<Comment> commentList = commentRepository.findByReviewId(review, pageRequest);
 
         Long currentMemberId;
-        if(memberResolver.isAuthenticated()){ currentMemberId = memberResolver.getCurrentMember().getId(); }
-        else{ currentMemberId = null; }
+        if (memberResolver.isAuthenticated()) {
+            currentMemberId = memberResolver.getCurrentMember().getId();
+        } else {
+            currentMemberId = null;
+        }
 
         List<CommentGetResponse> comments = commentList.getContent().stream()
                 .map(
@@ -134,11 +140,13 @@ public class CommentService {
                                     member.getId());
                             log.info("{}",
                                     memberRepository.getTierAndBadgeImgByMemberId(member.getId()));
-                            return CommentGetResponse.of(member, reviewId, comment, currentMemberId);
+                            return CommentGetResponse.of(member, reviewId, comment,
+                                    currentMemberId);
                         }
                 ).toList();
 
-        Page<CommentGetResponse> commentsPage = new PageImpl<>(comments, pageRequest, review.getCommentCounts());
+        Page<CommentGetResponse> commentsPage = new PageImpl<>(comments, pageRequest,
+                review.getCommentCounts());
 
         return new CommentGetAllResponse(
                 commentList.getTotalElements(),
@@ -158,9 +166,13 @@ public class CommentService {
         MemberBadgeAndTierDto dto = memberRepository.getTierAndBadgeImgByMemberId(member.getId());
 
         Long currentMemberId;
-        if(memberResolver.isAuthenticated()){ currentMemberId = memberResolver.getCurrentMember().getId(); }
-        else{ currentMemberId = null; }
+        if (memberResolver.isAuthenticated()) {
+            currentMemberId = memberResolver.getCurrentMember().getId();
+        } else {
+            currentMemberId = null;
+        }
 
-        return CommentGetResponse.of(member, comment.getReviewId().getId(), comment, currentMemberId);
+        return CommentGetResponse.of(member, comment.getReviewId().getId(), comment,
+                currentMemberId);
     }
 }

@@ -44,8 +44,16 @@ public class ScoreEventListener {
     @EventListener
     @Transactional
     public void handleCommentScoreEvent(CommentScoreEvent event) {
-        updateMemberTier(event.getMember(), event.getScoreAdjustment());
-        log.info("댓글 이벤트 처리완료");
+        updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
+
+        if (event.isCreated()) {
+            Alarm alarm = createReceiverAlarm(event.getGiver(), event.getReceiver(),
+                    "님이 내 글에 댓글을 남겼습니다.");
+
+            alarmService.sendNotificationToUser(event.getReceiver().getId(), alarm);
+
+            log.info("댓글 이벤트 처리완료");
+        }
     }
 
     @EventListener
@@ -54,7 +62,8 @@ public class ScoreEventListener {
         updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
 
         if (event.isCreated()) {
-            Alarm alarm = createThearAlarm(event.getGiver(), event.getReceiver(), "띠어럽👍");
+            Alarm alarm = createReceiverAlarm(event.getGiver(), event.getReceiver(),
+                    "님에게 '띠어럽👍' 을 받았습니다.");
             alarmService.sendNotificationToUser(event.getReceiver().getId(), alarm);
 
             log.info("띠어럽 이벤트 처리완료");
@@ -67,7 +76,8 @@ public class ScoreEventListener {
         updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
 
         if (event.isCreated()) {
-            Alarm alarm = createThearAlarm(event.getGiver(), event.getReceiver(), "띠어다운👎");
+            Alarm alarm = createReceiverAlarm(event.getGiver(), event.getReceiver(),
+                    "님에게 '띠어다운👎' 을 받았습니다.");
             alarmService.sendNotificationToUser(event.getReceiver().getId(), alarm);
 
             log.info("띠어다운 이벤트 처리 완료");
@@ -130,15 +140,15 @@ public class ScoreEventListener {
                 .build();
     }
 
-    private Alarm createThearAlarm(Member giver, Member receiver, String thearMsg) {
+    private Alarm createReceiverAlarm(Member giver, Member receiver, String msg) {
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        String message = String.format("[%d.%d %d:%d] '%s' 님에게 '%s'를 받았습니다.",
+        String message = String.format("[%d.%d %d:%d] '%s' %s",
                 now.getMonthValue(),
                 now.getDayOfMonth(),
                 now.getHour(),
                 now.getMinute(),
                 giver.getName(),
-                thearMsg);
+                msg);
 
         return Alarm.builder()
                 .createdAt(now)

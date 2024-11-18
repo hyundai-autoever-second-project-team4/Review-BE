@@ -8,12 +8,16 @@ import org.springframework.context.ApplicationEvent;
 public class CommentScoreEvent extends ApplicationEvent {
 
     private static final long COMMENT_SCORE_VALUE = 2;
-    private final Member member;
+    private final Member giver;
+    private final Member receiver;
     private final long scoreAdjustment;
+    private final boolean isCreated;
 
-    public CommentScoreEvent(Object source, Member member, boolean isCreated) {
+    public CommentScoreEvent(Object source, Member giver, Member receiver, boolean isCreated) {
         super(source);
-        this.member = member;
+        this.giver = giver;
+        this.receiver = receiver;
         this.scoreAdjustment = isCreated ? COMMENT_SCORE_VALUE : -COMMENT_SCORE_VALUE;
+        this.isCreated = isCreated;
     }
 }
