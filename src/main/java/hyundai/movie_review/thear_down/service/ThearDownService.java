@@ -41,7 +41,7 @@ public class ThearDownService {
             log.info("싫어요 삭제 완료");
 
             applicationEventPublisher.publishEvent(
-                    new ThearDownScoreEvent(this, review.getMember(), false));
+                    new ThearDownScoreEvent(this, currentMember, review.getMember(), false));
             return ThearDownResponse.of("싫어요 삭제 완료");
         } else {
             //싫어요가 없으면 새로 생성
@@ -54,7 +54,7 @@ public class ThearDownService {
             log.info("싫어요 생성 완료");
 
             applicationEventPublisher.publishEvent(
-                    new ThearDownScoreEvent(this, review.getMember(), true));
+                    new ThearDownScoreEvent(this, currentMember, review.getMember(), true));
 
             return ThearDownResponse.of("싫어요 생성 완료");
         }

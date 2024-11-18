@@ -50,14 +50,14 @@ public class ScoreEventListener {
     @EventListener
     @Transactional
     public void handleThearUpScoreEvent(ThearUpScoreEvent event) {
-        updateMemberTier(event.getMember(), event.getScoreAdjustment());
+        updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
         log.info("띠어럽 이벤트 처리완료");
     }
 
     @EventListener
     @Transactional
     public void handleThearDownScoreEvent(ThearDownScoreEvent event) {
-        updateMemberTier(event.getMember(), event.getScoreAdjustment());
+        updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
         log.info("띠어다운 이벤트 처리 완료");
     }
 
