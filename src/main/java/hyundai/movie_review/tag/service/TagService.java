@@ -25,10 +25,12 @@ public class TagService {
                 .map(Map.Entry::getKey)
                 .toList();
 
-        // 상위 3개 태그 DTO 변환
+        // 상위 3개 태그 ID에 해당하는 태그를 그룹화하고, 첫 번째 태그만 DTO로 변환
         List<TagInfoDto> topTags = movieTags.stream()
                 .filter(tag -> topTagIds.contains(tag.getTag().getId()))
-                .map(TagInfoDto::of)
+                .collect(Collectors.groupingBy(tag -> tag.getTag().getId()))
+                .values().stream()
+                .map(tags -> TagInfoDto.of(tags.get(0))) // 그룹의 첫 번째 태그만 선택
                 .toList();
 
         return new TagInfoListDto(topTags);
