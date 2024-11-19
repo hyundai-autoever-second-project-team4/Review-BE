@@ -8,6 +8,7 @@ import hyundai.movie_review.alarm.repository.AlarmRepository;
 import hyundai.movie_review.member.entity.Member;
 import hyundai.movie_review.security.MemberResolver;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -78,6 +79,16 @@ public class AlarmService {
         alarm.readAlarm();
 
         alarmRepository.save(alarm);
+    }
+
+    public void readAll() {
+        Member currentMember = memberResolver.getCurrentMember();
+
+        List<Alarm> alarms = alarmRepository.findAllByMemberId(currentMember.getId());
+
+        alarms.forEach(Alarm::readAlarm);
+
+        alarmRepository.saveAll(alarms);
     }
 
 }

@@ -53,4 +53,21 @@ public class AlarmController {
 
         return ResponseEntity.ok(AlarmReadResponse.of("알람 읽기 처리가 완료되었습니다."));
     }
+
+    @Operation(
+            summary = "모든 알람 읽기",
+            description = "현재 사용자가 읽지 않은 알람을 읽음 처리합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "알람 읽기 성공", content = @Content(schema = @Schema(implementation = AlarmReadResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "알람을 찾을 수 없음", content = @Content)
+            }
+    )
+    @PostMapping("/read-all")
+    public ResponseEntity<?> readAlarm() {
+        alarmService.readAll();
+
+        return ResponseEntity.ok(AlarmReadResponse.of("모든 알람 읽기 처리가 완료되었습니다."));
+    }
+
+
 }
