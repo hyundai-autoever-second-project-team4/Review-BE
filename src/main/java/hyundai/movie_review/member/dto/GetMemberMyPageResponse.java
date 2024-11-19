@@ -31,14 +31,14 @@ public record GetMemberMyPageResponse(
    @Schema(description = "멤버가 작성한 리뷰 정보")
    ReviewInfoListDto reviewInfoList
 ) {
-   public static GetMemberMyPageResponse of(Member member, GenreCountListDto genreList,
+   public static GetMemberMyPageResponse of(Member member, String nextTierName, GenreCountListDto genreList,
                                             ReviewCountArrayDto starRateList, ReviewInfoListDto reviewInfoList){
 
       return new GetMemberMyPageResponse(
               member.getName(),
               member.getProfileImage(),
               BadgeMyPageInfoDto.of(member),
-              TierMyPageInfoDto.of(member.getTier(), member.getTotalScore()),
+              TierMyPageInfoDto.of(member.getTier(), member.getTotalScore(), nextTierName),
               genreList,
               starRateList,
               reviewInfoList

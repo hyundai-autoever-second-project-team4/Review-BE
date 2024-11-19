@@ -28,6 +28,8 @@ import hyundai.movie_review.security.MemberResolver;
 import hyundai.movie_review.thear_down.repository.ThearDownRepository;
 import hyundai.movie_review.thear_up.repository.ThearUpRepository;
 import java.io.IOException;
+
+import hyundai.movie_review.tier.repository.TierRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +54,7 @@ public class MemberService {
 
     private final MemberResolver memberResolver;
     private final BadgeRepository badgeRepository;
+    private final TierRepository tierRepository;
     private final GenreRepository genreRepository;
     private final ReviewRepository reviewRepository;
     private final ThearUpRepository thearUpRepository;
@@ -74,6 +77,14 @@ public class MemberService {
                     .orElseThrow(MemberIdNotFoundException::new);
         }
         else{ member = memberResolver.getCurrentMember(); }
+        String nextTier = "영화의 신";
+        Long tierTotal = tierRepository.count();
+        Long tierNow = member.getTier().getId();
+        if(tierNow < tierTotal) {
+            nextTier = tierRepository.findById(tierNow+1)
+                    .orElseThrow(BadgeIdNotFoundException::new)
+                    .getName();
+        }
 
         // 2) 유저가 작성한 리뷰의 영화 장르들 가져오기
         GenreCountListDto genreCountList = genreRepository.getGenreCountByMember(member);
@@ -144,7 +155,7 @@ public class MemberService {
             }).toList();
         }
 
-        return GetMemberMyPageResponse.of(member, genreCountList, starRateList,
+        return GetMemberMyPageResponse.of(member, nextTier, genreCountList, starRateList,
                 ReviewInfoListDto.of(reviewDtoList));
     }
 

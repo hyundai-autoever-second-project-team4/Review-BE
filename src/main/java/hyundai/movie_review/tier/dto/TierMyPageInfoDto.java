@@ -9,6 +9,8 @@ public record TierMyPageInfoDto (
         Long tierId,
         @Schema(description = "티어 이름", example = "띠어력 신입")
         String tierName,
+        @Schema(description = "다음 티어 이름", example = "띠어력 초보")
+        String nextTierName,
         @Schema(description = "티어 이미지 경로", example = "http://k.kakaocdn.net/...")
         String tierImage,
         @Schema(description = "현재 티어에서 다음 티어까지 필요한 총 점수", example = "100")
@@ -16,7 +18,7 @@ public record TierMyPageInfoDto (
         @Schema(description = "사용자의 점수", example = "30")
         Long tierCurrentPoints
 ){
-    public static TierMyPageInfoDto of(Tier tier, Long score){
+    public static TierMyPageInfoDto of(Tier tier, Long score, String nextTierName){
         long requiredPoints = 0, currentPoints = 0;
 
         // Lv 1 ~ 3은 다음 티어/레벨까지 100 포인트 필요
@@ -39,6 +41,7 @@ public record TierMyPageInfoDto (
         return new TierMyPageInfoDto(
                 tier.getId(),
                 tier.getName(),
+                nextTierName,
                 tier.getImage(),
                 requiredPoints,
                 currentPoints
