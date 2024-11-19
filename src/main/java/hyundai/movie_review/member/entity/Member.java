@@ -82,6 +82,13 @@ public class Member {
         this.totalScore = score;
     }
 
+    // 받은 ThearUp 수 계산
+    public long getReceivedThearUpCount() {
+        return reviews.stream()
+                .filter(review -> !review.getDeleted())
+                .mapToLong(Review::getThearUps)
+                .sum();
+    }
 
     // MemberBadge와 연결
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)

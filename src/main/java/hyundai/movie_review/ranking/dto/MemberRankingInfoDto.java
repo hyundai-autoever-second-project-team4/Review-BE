@@ -12,7 +12,7 @@ public record MemberRankingInfoDto(
         long totalThearUpCount,
         long totalCommentCount,
         long memberTotalScore
-        ) {
+) {
 
     public static MemberRankingInfoDto of(Member member, int rank) {
         return new MemberRankingInfoDto(
@@ -24,7 +24,7 @@ public record MemberRankingInfoDto(
                 member.getReviews().stream()
                         .filter(review -> !review.getDeleted())
                         .count(),
-                member.getThearUps().size(),
+                member.getReceivedThearUpCount(),
                 member.getComments().size(),
                 member.getTotalScore()
         );

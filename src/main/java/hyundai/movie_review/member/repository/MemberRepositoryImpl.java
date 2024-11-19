@@ -65,20 +65,24 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     @Override
     public Page<Member> findAllOrderByUpCount(Pageable pageable) {
         QMember qMember = QMember.member;
+        QReview qReview = QReview.review;
         QThearUp qThearUp = QThearUp.thearUp;
 
         // 받은 'Up' 개수로 정렬
         JPQLQuery<Member> query = jpaQueryFactory
                 .select(qMember)
                 .from(qMember)
-                .leftJoin(qMember.thearUps, qThearUp)
+                .leftJoin(qMember.reviews, qReview) // Member의 리뷰를 조인
+                .leftJoin(qReview.thearUps, qThearUp) // 리뷰가 받은 좋아요를 조인
                 .groupBy(qMember.id)
                 .orderBy(
-                        Expressions.numberTemplate(Long.class, "count({0})", qThearUp.id).desc(),
-                        qMember.totalScore.desc()
+                        Expressions.numberTemplate(Long.class, "count({0})", qThearUp.id).desc(), // 받은 Up 개수 기준 정렬
+                        qMember.totalScore.desc() // 그다음 점수 기준 정렬
                 );
+
         return getPagedResult(query, pageable);
     }
+
 
     @Override
     public Page<Member> findAllOrderByCommentCount(Pageable pageable) {
