@@ -91,11 +91,18 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
     }
 
     @Override
-    public List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long genreId) {
+    public List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long genreId, long memberId) {
         QMovie movie = QMovie.movie;
         QGenre genre = QGenre.genre;
         QMovieGenre movieGenre = QMovieGenre.movieGenre;
         QReview review = QReview.review;
+
+        // 회원이 작성한 리뷰에 해당하는 Movie ID 조회
+        List<Long> reviewedMovieIds = queryFactory
+                .select(review.movie.id)
+                .from(review)
+                .where(review.member.id.eq(memberId)) // 작성한 리뷰의 movieId만 가져옴
+                .fetch();
 
         return queryFactory
                 .select(Projections.constructor(MovieWithRatingInfoDto.class,
@@ -114,14 +121,17 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
                 .from(movie)
                 .join(movieGenre).on(movieGenre.movie.eq(movie))
                 .join(movieGenre.genre, genre)
-                .where(genre.id.eq(genreId))
+                .where(
+                        genre.id.eq(genreId),
+                        movie.id.notIn(reviewedMovieIds) // 작성한 리뷰의 movieId 제외
+                )
                 .orderBy(
                         movie.totalStarRate.desc(),
                         movie.totalReviewCount.desc()
                 )
                 .limit(10)
                 .fetch();
-    }
+        }
 
     @Override
     public List<MovieWithRatingInfoDto> findHonorBoardMovies() {

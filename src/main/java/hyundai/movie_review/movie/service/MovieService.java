@@ -130,7 +130,6 @@ public class MovieService {
         log.info(movieGenreCountMap.toString());
 
         log.info("가장 선호하는 장르 id : {}", genreId);
-        System.out.println("가장 선호하는 장르");
 
         // 5) 영화 repository에서 해당 장르에 해당하는 영화를 가져온다.
         /* 가져올 때의 우선 순위는 다음과 같다.
@@ -138,7 +137,7 @@ public class MovieService {
          * 2) 리뷰가 많은 순
          * */
         List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findRecommendedMoviesForMemberByGenreId(
-                genreId);
+                genreId, currentMember.getId());
 
         return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);
 
