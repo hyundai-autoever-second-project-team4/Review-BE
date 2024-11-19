@@ -54,7 +54,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .from(qMember)
                 .leftJoin(qMember.reviews, qReview)
                 .groupBy(qMember.id)
-                .orderBy(Expressions.numberTemplate(Long.class, "count({0})", qReview.id).desc());
+                .orderBy(
+                        Expressions.numberTemplate(Long.class, "count({0})", qReview.id).desc(),
+                        qMember.totalScore.desc()   // 리뷰가 같을 경우 점수가 높은 순으로 정렬
+                );
 
         return getPagedResult(query, pageable);
     }
@@ -70,8 +73,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .from(qMember)
                 .leftJoin(qMember.thearUps, qThearUp)
                 .groupBy(qMember.id)
-                .orderBy(Expressions.numberTemplate(Long.class, "count({0})", qThearUp.id).desc());
-
+                .orderBy(
+                        Expressions.numberTemplate(Long.class, "count({0})", qThearUp.id).desc(),
+                        qMember.totalScore.desc()
+                );
         return getPagedResult(query, pageable);
     }
 
@@ -86,8 +91,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .from(qMember)
                 .leftJoin(qMember.comments, qComment)
                 .groupBy(qMember.id)
-                .orderBy(Expressions.numberTemplate(Long.class, "count({0})", qComment.id).desc());
-
+                .orderBy(
+                        Expressions.numberTemplate(Long.class, "count({0})", qComment.id).desc(),
+                        qMember.totalScore.desc()
+                );
         return getPagedResult(query, pageable);
     }
 
