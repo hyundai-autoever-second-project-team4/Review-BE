@@ -138,7 +138,6 @@ public class MovieService {
          * 2) 리뷰가 많은 순
          * */
         List<MovieWithRatingInfoDto> movieWithRatingInfoDtos = movieRepository.findRecommendedMoviesForMemberByGenreId(
-                currentMember.getId(),
                 genreId);
 
         return MovieWithRatingListResponse.of(movieWithRatingInfoDtos);

@@ -91,16 +91,11 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
     }
 
     @Override
-    public List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long memberId, long genreId) {
+    public List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long genreId) {
         QMovie movie = QMovie.movie;
         QGenre genre = QGenre.genre;
         QMovieGenre movieGenre = QMovieGenre.movieGenre;
         QReview review = QReview.review;
-
-        JPAQuery<Long> subQuery = queryFactory
-                .select(movie.id)
-                .from(review)
-                .where(review.member.id.eq(memberId));
 
         return queryFactory
                 .select(Projections.constructor(MovieWithRatingInfoDto.class,
@@ -119,10 +114,7 @@ public class MovieRepositoryCustomImpl implements MovieRepositoryCustom {
                 .from(movie)
                 .join(movieGenre).on(movieGenre.movie.eq(movie))
                 .join(movieGenre.genre, genre)
-                .where(
-                        genre.id.eq(genreId)
-                        .and(movie.id.notIn(subQuery))
-                )
+                .where(genre.id.eq(genreId))
                 .orderBy(
                         movie.totalStarRate.desc(),
                         movie.totalReviewCount.desc()
