@@ -12,7 +12,7 @@ public interface MovieRepositoryCustom {
 
     List<MovieWithRatingInfoDto> findMoviesByMostReviewsThisWeek();
 
-    List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long genreId);
+    List<MovieWithRatingInfoDto> findRecommendedMoviesForMemberByGenreId(long memberId, long genreId);
 
     List<MovieWithRatingInfoDto> findHonorBoardMovies();
     Page<Movie> findMoviesByGenreName(String genreName, Pageable pageable);
