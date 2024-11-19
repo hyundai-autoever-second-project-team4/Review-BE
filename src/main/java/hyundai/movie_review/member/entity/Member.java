@@ -44,7 +44,8 @@ public class Member {
 
     private String email;
     private String name;
-    @Column(name = "profile_image")
+    @Lob
+    @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
     private String social;
     @Column(name = "created_at")
