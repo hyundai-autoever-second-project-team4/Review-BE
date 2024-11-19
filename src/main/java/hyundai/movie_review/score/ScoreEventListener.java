@@ -38,6 +38,11 @@ public class ScoreEventListener {
     @Transactional
     public void handleReviewScoreEvent(ReviewScoreEvent event) {
         updateMemberTier(event.getMember(), event.getScoreAdjustment());
+
+        // 리뷰 작성자에 대한 뱃지 이벤트
+        BadgeAwardEvent badgeAwardEvent = new BadgeAwardEvent(this, event.getMember());
+        applicationEventPublisher.publishEvent(badgeAwardEvent);
+
         log.info("리뷰 이벤트 처리완료");
     }
 
@@ -45,6 +50,10 @@ public class ScoreEventListener {
     @Transactional
     public void handleCommentScoreEvent(CommentScoreEvent event) {
         updateMemberTier(event.getGiver(), event.getScoreAdjustment());
+
+        // 댓글받은 사람에 대한 뱃지 이벤트
+        BadgeAwardEvent badgeAwardEvent = new BadgeAwardEvent(this, event.getReceiver());
+        applicationEventPublisher.publishEvent(badgeAwardEvent);
 
         if (event.isCreated()) {
             Alarm alarm = createReceiverAlarm(event.getGiver(), event.getReceiver(),
@@ -61,6 +70,10 @@ public class ScoreEventListener {
     public void handleThearUpScoreEvent(ThearUpScoreEvent event) {
         updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
 
+        // thearup 받은 사람에 대한 뱃지 이벤트
+        BadgeAwardEvent badgeAwardEvent = new BadgeAwardEvent(this, event.getReceiver());
+        applicationEventPublisher.publishEvent(badgeAwardEvent);
+
         if (event.isCreated()) {
             Alarm alarm = createReceiverAlarm(event.getGiver(), event.getReceiver(),
                     "님에게 '띠어럽' 을 받았습니다.");
@@ -74,6 +87,10 @@ public class ScoreEventListener {
     @Transactional
     public void handleThearDownScoreEvent(ThearDownScoreEvent event) {
         updateMemberTier(event.getReceiver(), event.getScoreAdjustment());
+
+        // theardown 받은 사람에 대한 뱃지 이벤트
+        BadgeAwardEvent badgeAwardEvent = new BadgeAwardEvent(this, event.getReceiver());
+        applicationEventPublisher.publishEvent(badgeAwardEvent);
 
         if (event.isCreated()) {
             Alarm alarm = createReceiverAlarm(event.getGiver(), event.getReceiver(),
@@ -119,8 +136,6 @@ public class ScoreEventListener {
             log.info("Member ID: {} - 티어 유지: {} (점수: {})",
                     member.getId(), currentTier.getName(), newScore);
         }
-
-        applicationEventPublisher.publishEvent(new BadgeAwardEvent(this, member));
     }
 
     private Alarm createTierAlarm(Member member, Tier tier) {
