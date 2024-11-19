@@ -22,6 +22,7 @@ import hyundai.movie_review.movie_genre.entity.MovieGenre;
 import hyundai.movie_review.review.entity.Review;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -184,12 +185,10 @@ public class BadgeEventListener {
 
     private Alarm createBadgeAlarm(Member member, Badge badge) {
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        String message = String.format("[%d.%d %d:%d] %s 뱃지를 획득하였습니다.",
-                now.getMonthValue(),
-                now.getDayOfMonth(),
-                now.getHour(),
-                now.getMinute(),
-                badge.getName());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[MM월 dd일 HH:mm:ss]");
+        String formattedDateTime = now.format(formatter);
+
+        String message = String.format("%s %s 뱃지를 획득하였습니다.", formattedDateTime, badge.getName());
 
         log.info("뱃지 알람 생성 : [{}]", message);
 

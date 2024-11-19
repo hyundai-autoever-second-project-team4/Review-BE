@@ -17,6 +17,7 @@ import hyundai.movie_review.tier.exception.TierIdNotFoundException;
 import hyundai.movie_review.tier.repository.TierRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -140,14 +141,12 @@ public class ScoreEventListener {
 
     private Alarm createTierAlarm(Member member, Tier tier) {
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        String message = String.format("[%d.%d %d:%d] '%s' 티어로 변경되었습니다.",
-                now.getMonthValue(),
-                now.getDayOfMonth(),
-                now.getHour(),
-                now.getMinute(),
-                tier.getName());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[MM월 dd일 HH:mm:ss]");
+        String formattedDateTime = now.format(formatter);
 
-        log.info("뱃지 알람 생성 : [{}]", message);
+        String message = String.format("%s '%s' 티어로 변경되었습니다.", formattedDateTime, tier.getName());
+
+        log.info("티어 알람 생성 : [{}]", message);
 
         return Alarm.builder()
                 .createdAt(now)
@@ -159,15 +158,12 @@ public class ScoreEventListener {
 
     private Alarm createReceiverAlarm(Member giver, Member receiver, String msg) {
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        String message = String.format("[%d.%d %d:%d] '%s' %s",
-                now.getMonthValue(),
-                now.getDayOfMonth(),
-                now.getHour(),
-                now.getMinute(),
-                giver.getName(),
-                msg);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[MM월 dd일 HH:mm:ss]");
+        String formattedDateTime = now.format(formatter);
 
-        log.info("뱃지 알람 생성 : [{}]", message);
+        String message = String.format("%s '%s' %s", formattedDateTime, giver.getName(), msg);
+
+        log.info("수신자 알람 생성 : [{}]", message);
 
         return Alarm.builder()
                 .createdAt(now)
