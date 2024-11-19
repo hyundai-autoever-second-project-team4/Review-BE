@@ -63,9 +63,17 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
         return queryFactory
                 .selectFrom(review)
-                .where(review.createdAt.between(yesterday.atStartOfDay(), today.atStartOfDay())
-                        .and(review.deleted.isFalse()))
-                .orderBy(review.thearUps.size().desc(), review.starRate.desc())
+                .where(
+                        review.createdAt.between(
+                                        yesterday.atStartOfDay(), // 어제의 00:00
+                                        today.plusDays(1).atStartOfDay() // 오늘의 마지막 시간 포함
+                                )
+                                .and(review.deleted.isFalse())
+                )
+                .orderBy(
+                        review.thearUps.size().desc(), // 좋아요 수 기준 내림차순
+                        review.starRate.desc()         // 별점 기준 내림차순
+                )
                 .limit(10)
                 .fetch();
     }
