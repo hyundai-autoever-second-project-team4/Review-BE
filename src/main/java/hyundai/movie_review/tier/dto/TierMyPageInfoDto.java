@@ -5,17 +5,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "마이페이지에 필요한 티어 정보 DTO")
 public record TierMyPageInfoDto (
-        @Schema(description = "티어 ID", example = "1")
+        @Schema(description = "티어 ID", example = "2")
         Long tierId,
-        @Schema(description = "티어 이름", example = "띠어력 신입")
+        @Schema(description = "티어 이름", example = "띠어력 초보")
         String tierName,
-        @Schema(description = "다음 티어 이름", example = "띠어력 초보")
+        @Schema(description = "다음 티어 이름", example = "띠어력 중수")
         String nextTierName,
         @Schema(description = "티어 이미지 경로", example = "http://k.kakaocdn.net/...")
         String tierImage,
+        @Schema(description = "사용자의 총 점수", example = "130")
+        Long tierTotalPoints,
         @Schema(description = "현재 티어에서 다음 티어까지 필요한 총 점수", example = "100")
         Long tierRequiredPoints,
-        @Schema(description = "사용자의 점수", example = "30")
+        @Schema(description = "현재 티어에서 쌓은 점수", example = "30")
         Long tierCurrentPoints
 ){
     public static TierMyPageInfoDto of(Tier tier, Long score, String nextTierName){
@@ -43,6 +45,7 @@ public record TierMyPageInfoDto (
                 tier.getName(),
                 nextTierName,
                 tier.getImage(),
+                score,
                 requiredPoints,
                 currentPoints
         );
