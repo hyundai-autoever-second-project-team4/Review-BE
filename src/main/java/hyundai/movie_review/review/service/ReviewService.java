@@ -28,6 +28,7 @@ import hyundai.movie_review.tag.repository.TagRepository;
 import hyundai.movie_review.thear_down.repository.ThearDownRepository;
 import hyundai.movie_review.thear_up.repository.ThearUpRepository;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -118,7 +119,7 @@ public class ReviewService {
                 .starRate(request.starRate())
                 .content(request.content())
                 .spoiler(request.spoiler())
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .deleted(false)
                 .build();
 

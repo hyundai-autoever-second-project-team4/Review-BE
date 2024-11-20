@@ -16,6 +16,7 @@ import hyundai.movie_review.review.entity.Review;
 import hyundai.movie_review.review.repository.ReviewRepository;
 import hyundai.movie_review.security.MemberResolver;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -48,8 +49,8 @@ public class CommentService {
                 .memberId(currentMember)
                 .reviewId(review)
                 .content(request.content())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
 
         // 3) repository (db)에 저장
