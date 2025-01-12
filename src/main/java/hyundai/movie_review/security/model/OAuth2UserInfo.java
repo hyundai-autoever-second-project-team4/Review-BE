@@ -3,6 +3,7 @@ package hyundai.movie_review.security.model;
 import hyundai.movie_review.member.entity.Member;
 import java.time.LocalDateTime;
 import java.util.Map;
+
 import lombok.Builder;
 
 @Builder
@@ -56,8 +57,6 @@ public record OAuth2UserInfo(
 
     public Member toEntity() {
         Member member = Member.builder()
-                .badgeId(1L)
-                .tierId(1L)
                 .email(email)
                 .name(name)
                 .profileImage(profileImage)

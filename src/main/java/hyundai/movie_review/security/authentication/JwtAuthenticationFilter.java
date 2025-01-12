@@ -14,9 +14,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -37,8 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        String accessToken = extractTokenFromCookies(request, "accessToken");
-        String refreshToken = extractTokenFromCookies(request, "refreshToken");
+        String accessToken = extractTokenFromHeaders(request, "Authorization");
+        String refreshToken = extractTokenFromHeaders(request, "RefreshToken");
 
         log.info("accessToken : {}", accessToken);
         log.info("refreshToken : {}", refreshToken);
@@ -58,7 +56,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
                 handleRefreshToken(request, response, refreshToken);
-                return;
             } catch (CustomJwtException e) {
                 log.error("JWT 검증 오류: {}", e.getMessage());
                 setErrorResponse(response, HttpStatus.UNAUTHORIZED, e.getMessage(),
@@ -71,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
         } else {
-            log.info("Authorization 헤더와 쿠키에서 accessToken이 없습니다.");
+            log.info("Authorization 헤더에서 accessToken이 없습니다.");
         }
 
         filterChain.doFilter(request, response);
@@ -88,7 +85,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String newAccessToken = jwtTokenProvider.generateAccessToken(claims);
 
             authenticateUser(claims);
-            addAccessTokenCookie(response, newAccessToken, request);
+
+            // Set the new Access Token as a Cookie
+            addCookie(response, "accessToken", newAccessToken, request.getServerName());
 
             log.info("새로운 accessToken 발급 및 Security Context에 인증 정보 저장 완료");
 
@@ -97,6 +96,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Failed to refresh access token",
                     ex.getClass().getSimpleName());
         }
+    }
+
+    private void addCookie(HttpServletResponse response, String name, String value, String domain) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(false);
+        cookie.setPath("/");
+        cookie.setDomain(domain.contains("localhost") ? "localhost" : "theaterup.site");
+        cookie.setSecure(!domain.contains("localhost")); // 배포 환경에서는 Secure 속성 활성화
+        cookie.setMaxAge(60 * 60 * 24); // 1일 동안 유효
+        response.addCookie(cookie);
     }
 
     private Map<String, Object> generateClaims(Member member) {
@@ -109,22 +118,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
     }
 
-    private void addAccessTokenCookie(HttpServletResponse response, String accessToken,
-            HttpServletRequest request) {
-        String domain =
-                request.getServerName().contains("localhost") ? "localhost" : "theaterup.site";
-        boolean isSecure = !domain.equals("localhost");
-
-        String accessTokenCookie = String.format(
-                "accessToken=%s; Domain=%s; Path=/; HttpOnly; %s; Max-Age=%d",
-                accessToken,
-                domain,
-                isSecure ? "Secure; SameSite=None" : "", // 배포 환경에서만 보안 속성 추가
-                60 * 60 * 24
-        );
-        response.addHeader("Set-Cookie", accessTokenCookie);
-    }
-
     private void authenticateUser(Map<String, Object> claims) {
         MemberAuthenticationDto memberAuthenticationDto = new MemberAuthenticationDto(claims);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -132,27 +125,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 
-    private String extractTokenFromCookies(HttpServletRequest request, String tokenName) {
-        if (request.getCookies() != null) {
-            Optional<Cookie> tokenCookie = Arrays.stream(request.getCookies())
-                    .filter(cookie -> tokenName.equals(cookie.getName()))
-                    .findFirst();
-            return tokenCookie.map(Cookie::getValue).orElse(null);
+    private String extractTokenFromHeaders(HttpServletRequest request, String headerName) {
+        String headerValue = request.getHeader(headerName);
+        if (headerValue != null && headerValue.startsWith("Bearer ")) {
+
+            String value = headerValue.substring(7);
+            if (value.startsWith("null")) {
+                return null;
+            }
+            return value; // "Bearer " 제거
         }
         return null;
     }
 
     private void setErrorResponse(HttpServletResponse response, HttpStatus status, String message,
             String exception) throws IOException {
-        // 응답이 이미 커밋된 경우 메서드 종료
         if (response.isCommitted()) {
             return;
         }
 
-        // BusinessExceptionResponse 생성
-        BusinessExceptionResponse exceptionResponse = new BusinessExceptionResponse(status, message, exception);
+        BusinessExceptionResponse exceptionResponse = new BusinessExceptionResponse(status, message,
+                exception);
 
-        // JSON 응답 작성
         response.setStatus(status.value());
         response.setContentType("application/json");
         ObjectMapper objectMapper = new ObjectMapper();

@@ -2,7 +2,6 @@ package hyundai.movie_review.config;
 
 import hyundai.movie_review.security.authentication.CustomUserDetailService;
 import hyundai.movie_review.security.authentication.JwtAuthenticationFilter;
-import hyundai.movie_review.security.authentication.JwtTokenProvider;
 import hyundai.movie_review.security.handler.CustomAuthenticationSuccessHandler;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,9 +45,10 @@ public class SecurityConfig {
 
                     // 허용할 출처 설정 (모든 출처를 허용하거나 특정 도메인 추가)
                     config.setAllowedOrigins(List.of(
-                            "http://localhost:3000",  // 로컬 개발 환경에서의 요청 허용
+                            "http://localhost:5173",  // 로컬 개발 환경에서의 요청 허용
                             "http://localhost:8080",    // 로컬 개발 환경에서의 요청 허용
                             "https://theaterup.site",     // 프론트엔드 CloudFront 도메인
+                            "http://127.0.0.1:5500/",
                             "https://api.theaterup.site"  // 백엔드 EC2 도메인
                             // 배포된 서버의 도메인 추가 예정
                     ));
